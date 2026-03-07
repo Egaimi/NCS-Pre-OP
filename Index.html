@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f8fafc" />
+  <title>Pre-operative NCS Assessment — ESC 2022</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --panel: rgba(255,255,255,0.97);
+      --panel-solid: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --muted2: #64748b;
+      --line: #e2e8f0;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --primary-light: rgba(15,118,110,0.08);
+      --danger: #dc2626;
+      --shadow: 0 8px 28px rgba(15,23,42,0.09);
+      --radius: 22px;
+      --radius-sm: 14px;
+      --tap: 52px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+      /* rec type colours */
+      --c-test:    #2563eb; --cbg-test:    rgba(37,99,235,0.08);
+      --c-consult: #7c3aed; --cbg-consult: rgba(124,58,237,0.08);
+      --c-monitor: #0f766e; --cbg-monitor: rgba(15,118,110,0.08);
+      --c-med:     #b45309; --cbg-med:     rgba(180,83,9,0.08);
+      --c-urgent:  #dc2626; --cbg-urgent:  rgba(220,38,38,0.08);
+      --c-ok:      #15803d; --cbg-ok:      rgba(21,128,61,0.08);
+      --c-info:    #475569; --cbg-info:    rgba(71,85,105,0.07);
+      --c-delay:   #b91c1c; --cbg-delay:   rgba(185,28,28,0.07);
+      --c-action-proceed: #166534;
+      --c-action-delay:   #991b1b;
+      --c-action-consult: #5b21b6;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-shell {
+      min-height: 100dvh;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: calc(16px + var(--safe-top)) 14px calc(24px + var(--safe-bottom));
+    }
+
+    /* ── LOGO BAR ── */
+    .logo-bar {
+      padding: 0 0 14px;
+      display: flex; align-items: flex-start;
+      margin: 0 -14px;          /* bleed to card edges */
+      overflow: hidden;
+      border-radius: 14px 14px 0 0;
+    }
+    .site-logo {
+      width: 100%;
+      height: 88px;
+      object-fit: cover;
+      object-position: center center;
+      display: block;
+    }
+
+    /* ── HERO ── */
+    .hero { padding: 4px 6px 18px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px; border-radius: 999px;
+      background: var(--primary-light); color: var(--primary-dark);
+      font-size: 0.76rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    h1 { margin: 0; font-size: clamp(1.5rem,4vw,1.95rem); line-height: 1.1; letter-spacing:-0.03em; }
+    .subtitle { margin: 8px 0 0; color: var(--muted); font-size: 0.94rem; line-height:1.5; }
+
+    /* ── CARD SHELL ── */
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.8);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-wrap {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,255,255,0.85));
+    }
+    .progress-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 9px; font-size: 0.84rem; color: var(--muted); font-weight: 600;
+    }
+    .progress-bar { height: 9px; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
+    .progress-fill {
+      height: 100%; width: 0%; border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), #14b8a6);
+      transition: width 220ms ease;
+    }
+
+    /* ── STEP CONTENT ── */
+    .content, .result-screen { padding: 18px; }
+    .step-title { font-size: 1.16rem; line-height: 1.32; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.02em; }
+    .step-note  { margin: 0 0 16px; color: var(--muted); font-size: 0.90rem; line-height: 1.5; }
+    .form-grid  { display: grid; gap: 14px; }
+
+    /* ── FIELD CARDS ── */
+    .field-card {
+      border: 1px solid var(--line); border-radius: var(--radius-sm);
+      padding: 14px; background: rgba(255,255,255,0.90);
+    }
+    .field-label { display: block; margin: 0 0 9px; font-size: 0.94rem; font-weight: 800; color: var(--text); }
+    .field-help  { margin: -3px 0 9px; color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
+
+    /* ── CHOICE BUTTONS ── */
+    .choice-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .choice, .toggle {
+      min-height: var(--tap); width: 100%;
+      border: 1.5px solid var(--line); background: var(--panel-solid);
+      color: var(--text); border-radius: 12px; padding: 11px 12px;
+      text-align: left; font-size: 0.93rem; font-weight: 700; line-height: 1.3;
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      font-family: inherit;
+    }
+    .choice.selected, .toggle.selected {
+      border-color: var(--primary); background: var(--primary-light);
+      box-shadow: 0 8px 22px rgba(15,118,110,0.13);
+    }
+    .toggle-list { display: grid; gap: 9px; }
+    .check {
+      flex: 0 0 auto; width: 22px; height: 22px; border-radius: 999px;
+      border: 2px solid #cbd5e1; display: grid; place-items: center;
+      color: white; font-size: 0.80rem; font-weight: 900; background: transparent;
+    }
+    .selected .check { border-color: var(--primary); background: var(--primary); }
+
+    /* ── SUMMARY CHIPS ── */
+    .summary {
+      margin-top: 14px; padding: 13px; border: 1px solid var(--line);
+      border-radius: var(--radius-sm); background: rgba(255,255,255,0.82);
+    }
+    .summary h2 { margin: 0 0 9px; font-size: 0.88rem; font-weight: 700; color: var(--muted2); }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip {
+      padding: 5px 10px; border-radius: 999px; background: #f1f5f9;
+      color: #334155; font-size: 0.76rem; font-weight: 700; border: 1px solid #e2e8f0;
+    }
+
+    /* ── FOOTER BUTTONS ── */
+    .step-footer {
+      display: flex; gap: 10px; padding: 14px 18px 18px;
+      border-top: 1px solid var(--line); background: rgba(248,250,252,0.92);
+      position: sticky; bottom: 0;
+    }
+    button { font: inherit; }
+    .btn {
+      min-height: var(--tap); border: none; border-radius: 14px; padding: 0 18px;
+      font-weight: 800; cursor: pointer; transition: transform 110ms ease, opacity 110ms ease;
+    }
+    .btn:active  { transform: scale(0.99); }
+    .btn:disabled { opacity: 0.40; cursor: not-allowed; transform: none; }
+    .btn-secondary { background: #e2e8f0; color: #334155; min-width: 100px; }
+    .btn-primary {
+      background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white; flex: 1; box-shadow: 0 8px 20px rgba(15,118,110,0.22);
+    }
+    .btn-danger {
+      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+      color: white; width: 100%; box-shadow: 0 8px 20px rgba(220,38,38,0.17);
+    }
+
+    /* ── RESULT SCREEN ── */
+    .result-screen { display: none; }
+    .result-header {
+      display: flex; gap: 14px; align-items: flex-start; margin-bottom: 18px;
+      padding: 16px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(15,118,110,0.05), rgba(20,184,166,0.04));
+      border: 1px solid rgba(15,118,110,0.12);
+    }
+    .result-header.urgent-header  { background: rgba(220,38,38,0.05); border-color: rgba(220,38,38,0.15); }
+    .result-header.warning-header { background: rgba(217,119,6,0.05); border-color: rgba(217,119,6,0.15); }
+    .result-header.danger-header  { background: rgba(220,38,38,0.05); border-color: rgba(220,38,38,0.15); }
+    .result-icon {
+      width: 50px; height: 50px; border-radius: 14px;
+      display: grid; place-items: center; font-size: 1.4rem;
+      background: rgba(21,128,61,0.10); color: #15803d; flex: 0 0 auto;
+    }
+    .result-icon.urgent-icon  { background: rgba(220,38,38,0.10); color: #dc2626; }
+    .result-icon.warning-icon { background: rgba(217,119,6,0.10); color: #b45309; }
+    .result-icon.danger-icon  { background: rgba(220,38,38,0.10); color: #dc2626; }
+    .result-title { margin: 0; font-size: 1.18rem; line-height: 1.22; letter-spacing: -0.02em; font-weight: 800; }
+    .result-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 0.90rem; line-height: 1.45; }
+
+    /* ── RISK CARD ── */
+    .risk-card {
+      margin-bottom: 18px; border: 1px solid var(--line);
+      border-radius: var(--radius-sm); padding: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(248,250,252,0.94));
+    }
+    .risk-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 12px; margin-bottom: 14px;
+    }
+    .risk-title { margin: 0; font-size: 0.92rem; font-weight: 800; color: var(--text); }
+    .risk-score { font-size: 0.86rem; color: var(--muted); font-weight: 800; }
+
+    /* ── GAUGE LAYOUT ── */
+    .gauge-wrap {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .gauge-svg-col {}
+    .gauge-metrics { display: grid; gap: 10px; }
+    .metric-box {
+      padding: 11px 12px; border-radius: 12px;
+      background: #fff; border: 1px solid #eef0f5;
+    }
+    .metric-label { font-size: 0.74rem; color: var(--muted); font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .metric-value { font-size: 1.18rem; font-weight: 900; letter-spacing: -0.02em; }
+    .risk-band {
+      display: inline-flex; padding: 5px 10px; border-radius: 999px;
+      font-size: 0.76rem; font-weight: 800; width: fit-content;
+    }
+    .risk-band.band-vlow  { background: rgba(15,118,110,0.10); color: #0f766e;  border:1px solid rgba(15,118,110,0.2); }
+    .risk-band.band-low   { background: rgba(22,163,74,0.10);  color: #15803d;  border:1px solid rgba(22,163,74,0.2); }
+    .risk-band.band-inter { background: rgba(217,119,6,0.10);  color: #b45309;  border:1px solid rgba(217,119,6,0.2); }
+    .risk-band.band-high  { background: rgba(220,38,38,0.10);  color: #dc2626;  border:1px solid rgba(220,38,38,0.2); }
+
+    /* ── SVG GAUGE ── */
+    svg.gauge-svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .gauge-bg         { stroke: #e9edf2; stroke-width: 13; fill: none; stroke-linecap: round; }
+    .gauge-zone-low   { stroke: #86efac; stroke-width: 13; fill: none; stroke-linecap: round; opacity: 0.9; }
+    .gauge-zone-mid   { stroke: #fcd34d; stroke-width: 13; fill: none; stroke-linecap: round; opacity: 0.9; }
+    .gauge-zone-high  { stroke: #fca5a5; stroke-width: 13; fill: none; stroke-linecap: round; opacity: 0.9; }
+    .gauge-fill       { stroke: #0f766e; stroke-width: 13; fill: none; stroke-linecap: round; transition: stroke 0.3s; }
+    .gauge-tick       { stroke: #94a3b8; stroke-width: 1.5; }
+    .gauge-score {
+      font-size: 26px; font-weight: 900; fill: #0f172a;
+      text-anchor: middle; dominant-baseline: middle;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+    .gauge-caption { font-size: 10.5px; font-weight: 600; fill: #64748b; text-anchor: middle; }
+    .gauge-band-label { font-size: 9px; font-weight: 700; text-anchor: middle; }
+    .gauge-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; justify-content: center; }
+    .gauge-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700; color: var(--muted); }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── RCRI FACTORS ── */
+    .risk-factors { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 7px; }
+    .risk-factor {
+      padding: 5px 10px; border-radius: 999px; background: #fff;
+      border: 1px solid #e2e8f0; color: #334155;
+      font-size: 0.75rem; font-weight: 700;
+    }
+    .esc-row {
+      display: flex; align-items: center; gap: 8px; margin-top: 10px;
+      padding: 9px 12px; border-radius: 10px;
+      background: rgba(15,118,110,0.06); border: 1px solid rgba(15,118,110,0.14);
+    }
+    .esc-label { font-size: 0.76rem; font-weight: 700; color: var(--primary-dark); }
+    .esc-chip {
+      padding: 3px 9px; border-radius: 999px; font-size: 0.74rem; font-weight: 800;
+    }
+    .esc-chip.esc-low   { background: rgba(22,163,74,0.12);  color: #15803d; }
+    .esc-chip.esc-inter { background: rgba(217,119,6,0.12);  color: #b45309; }
+    .esc-chip.esc-high  { background: rgba(220,38,38,0.12);  color: #dc2626; }
+
+    /* ── RECOMMENDATIONS ── */
+    .rec-section-title {
+      font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted2); margin: 18px 0 10px;
+    }
+    .recommendations { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+    .recommendations li {
+      padding: 13px 14px 13px 46px; position: relative;
+      border: 1px solid var(--line); border-left: 3px solid var(--line);
+      border-radius: var(--radius-sm); background: #fff;
+      font-size: 0.90rem; line-height: 1.5; color: #1e293b;
+    }
+    .recommendations li::before {
+      position: absolute; left: 13px; top: 12px;
+      width: 22px; height: 22px; border-radius: 8px;
+      display: grid; place-items: center; font-size: 0.80rem; font-weight: 900;
+      content: "✓"; background: var(--cbg-ok); color: var(--c-ok);
+    }
+
+    /* Category overrides */
+    .recommendations li[data-type="test"]    { border-left-color: var(--c-test); }
+    .recommendations li[data-type="test"]::before    { content: "🔬"; background: var(--cbg-test); }
+
+    .recommendations li[data-type="consult"] { border-left-color: var(--c-consult); }
+    .recommendations li[data-type="consult"]::before { content: "👥"; background: var(--cbg-consult); }
+
+    .recommendations li[data-type="monitor"] { border-left-color: var(--c-monitor); }
+    .recommendations li[data-type="monitor"]::before { content: "📈"; background: var(--cbg-monitor); }
+
+    .recommendations li[data-type="med"]     { border-left-color: var(--c-med); }
+    .recommendations li[data-type="med"]::before     { content: "💊"; background: var(--cbg-med); }
+
+    .recommendations li[data-type="urgent"]  { border-left-color: var(--c-urgent); background: rgba(220,38,38,0.03); }
+    .recommendations li[data-type="urgent"]::before  { content: "⚡"; background: var(--cbg-urgent); }
+
+    .recommendations li[data-type="ok"]      { border-left-color: var(--c-ok); }
+    .recommendations li[data-type="ok"]::before      { content: "✓"; background: var(--cbg-ok); color: var(--c-ok); }
+
+    .recommendations li[data-type="info"]    { border-left-color: #cbd5e1; background: rgba(248,250,252,0.8); }
+    .recommendations li[data-type="info"]::before    { content: "ℹ"; background: var(--cbg-info); color: var(--c-info); }
+
+    .recommendations li[data-type="delay"]   { border-left-color: #b91c1c; background: rgba(185,28,28,0.03); }
+    .recommendations li[data-type="delay"]::before   { content: "🚫"; background: rgba(185,28,28,0.08); }
+
+    /* ── INLINE ACTIONS ── */
+    .inline-actions { display: grid; gap: 9px; margin-top: 18px; }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .btn-outline {
+      min-height: 48px; border: 1.5px solid var(--line); background: #fff;
+      color: #334155; border-radius: 12px; padding: 0 16px;
+      font-size: 0.90rem; font-weight: 700; cursor: pointer; font-family: inherit;
+      transition: all 0.15s;
+    }
+    .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+    /* ── ESC REFERENCE BADGE ── */
+    .esc-ref-badge {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+      padding: 8px 12px; border-radius: 10px;
+      background: rgba(15,118,110,0.06); border: 1px solid rgba(15,118,110,0.14);
+      font-size: 0.76rem; color: var(--primary-dark); font-weight: 700;
+    }
+
+    /* ── ACTION BANNER ── */
+    .action-banner {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: 14px;
+      margin-bottom: 14px;
+      border: 2px solid;
+    }
+    .action-banner.proceed  { background: rgba(21,128,61,0.07);  border-color: rgba(21,128,61,0.35); }
+    .action-banner.delay    { background: rgba(185,28,28,0.07);  border-color: rgba(185,28,28,0.35); }
+    .action-banner.consult  { background: rgba(91,33,182,0.07);  border-color: rgba(91,33,182,0.35); }
+    .action-banner.caution  { background: rgba(180,83,9,0.07);   border-color: rgba(180,83,9,0.35);  }
+    .action-banner-icon { font-size: 1.7rem; flex-shrink: 0; line-height: 1; }
+    .action-banner-body {}
+    .action-banner-label {
+      font-size: 0.70rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 2px;
+    }
+    .proceed  .action-banner-label { color: #166534; }
+    .delay    .action-banner-label { color: #991b1b; }
+    .consult  .action-banner-label { color: #5b21b6; }
+    .caution  .action-banner-label { color: #92400e; }
+    .action-banner-text {
+      font-size: 0.95rem; font-weight: 800; line-height: 1.25; letter-spacing: -0.01em;
+    }
+    .proceed  .action-banner-text { color: #14532d; }
+    .delay    .action-banner-text { color: #7f1d1d; }
+    .consult  .action-banner-text { color: #4c1d95; }
+    .caution  .action-banner-text { color: #78350f; }
+    .action-banner-sub {
+      font-size: 0.81rem; color: var(--muted); margin-top: 3px; line-height: 1.4;
+    }
+
+    /* ── PDF PRINT BUTTON ── */
+    .btn-print {
+      min-height: 48px; border: 1.5px solid #cbd5e1; background: #fff;
+      color: #1e3a5f; border-radius: 12px; padding: 0 18px;
+      font-size: 0.90rem; font-weight: 700; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.15s; width: 100%;
+    }
+    .btn-print:hover { background: #f0f7ff; border-color: #93c5fd; color: #1d4ed8; }
+
+    /* ── PRINT / PDF ── */
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: white !important; }
+      .hero, .progress-wrap, #questionScreen, #footer,
+      .inline-actions, .btn-print { display: none !important; }
+      .app-shell { padding: 0 !important; max-width: 100% !important; }
+      .card { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+      #resultScreen { display: block !important; padding: 18px 22px !important; }
+      .result-header { break-inside: avoid; }
+      .risk-card { break-inside: avoid; page-break-inside: avoid; }
+      .recommendations li { break-inside: avoid; page-page-inside: avoid; }
+      .action-banner { break-inside: avoid; }
+      .disclaimer-box { break-inside: avoid; }
+      .print-header { display: flex !important; }
+    }
+    @media screen {
+      .print-header { display: none; }
+    }
+
+    /* Print header layout */
+    .print-header {
+      align-items: center; justify-content: space-between;
+      padding: 0 0 14px; margin-bottom: 18px;
+      border-bottom: 2px solid #e2e8f0;
+      gap: 16px;
+    }
+    
+    .print-header-right { text-align: right; }
+    .print-header-title { font-size: 1.05rem; font-weight: 800; color: #0f172a; }
+    .print-header-dept  { font-size: 0.76rem; color: #64748b; margin-top: 3px; }
+    .print-header-meta-row { font-size: 0.72rem; color: #94a3b8; margin-top: 4px; display: flex; gap: 12px; justify-content: flex-end; }
+    .print-logo { height: 66px; width: auto; max-width: 400px; object-fit: contain; filter: none; opacity: 1; }
+
+    /* ── DISCLAIMER ── */
+    .disclaimer-box {
+      margin-top: 20px;
+      padding: 13px 15px;
+      border-radius: 12px;
+      border: 1px solid #fde68a;
+      background: #fffbeb;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .disclaimer-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .disclaimer-body {}
+    .disclaimer-title { font-size: 0.76rem; font-weight: 800; color: #92400e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .disclaimer-text  { font-size: 0.78rem; color: #78350f; line-height: 1.55; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 480px) {
+      .choice-grid { grid-template-columns: 1fr; }
+      .gauge-wrap  { grid-template-columns: 1fr; }
+      .btn-row     { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<main class="app-shell">
+  <section class="hero">
+    <div class="logo-bar">
+      <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCAC/BGgDASIAAhEBAxEB/8QAHAABAAICAwEAAAAAAAAAAAAAAAUGBAcBAgMI/8QAGgEBAQEBAQEBAAAAAAAAAAAAAAECAwQFBv/aAAwDAQACEAMQAAAB+puOeM0AB17QeL7ylVtWN8jtzcc13GrEj5DUCwAAADpj+2NjWcN5AA8+3YAAAAAAAAAAAAAAADod0fITQXIAAAAAAAAAAAAAAAAAAAADjkAAAAAAAAAAAAcixxzxKAABhZnKULFfsDGsHONQLAAAAAAAAAAAAAAAAAAAAAAAAHn6DSO39GTPzPv7pefp9P4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHIscc8SgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOOQABoKobf+dPmfrt+bc+Ofr30/MyR6viOvj828/dfbL8w/XPm+nOj2/ngBwcouTOTWS7NCAGstmqCAAAAAAAAAAAAAAGPkAAAAADG9oDnqRkYSbOR1w454lEfLIPP0sAAAAAAAAAAAAAAAae2voZq5bE0ttCWuSFalDYepdtaRS83nVNiqobm+eN5S0Dx6yRsOj2XVtmwpDWWxTWe1tC/QUvGuMmnm8dRbm1RZfLAMgHFZubOJrG+Svr7Vvl+385/RfzxtHz/AG/ok1r7/wAhrvV0h2+V+8tn1DTbl9D8iHo+UBg5OsdprTrZ69CqVv085q5ZtcmrmvSFt1YvOzdY7JK/atabLQEAAAo2Bgyk3f8AvFylwAAABxzjZEvIsAAiJXszQ1AAAAAPH2DkWOOeJUVKs3HyDUAAAAcRmRjWYN5AAAAAAAAAx4Sxlr2VLisRt5Cg34QPnYhhYM2Kbxcx5Q08SrTWeWs5c2K7kTQwIizAEAfPv0Fib8nyz9AfMcfrx/bvGrto8vr/AD9B/TuvvH96+fN25dd82vdj5u49a5Hu/PgAQ9X2AXX7YAgO06NX2iZzzX+bcxC1TYvBq+Ru2Uuv2wCa/bAGv2wBr9sAa9kbiAQAAAAAAAAAAAAAAADkWOOeJQAAAAAHHIAAAAAAAAAAAxqdeqMtn9qhLGLOQuMtk61Xgm5Sm8FwwovNSawMKMLL1gfcmPSlTKzvNO5LpnUq6oCAAVX5b+ydUb8Wodja7qHT5H3O1Htzl97VE7b8vyfUD0+EAAAABGyVcWVzqXLE9B9Ycs/aqck3zDyxOoKomx/GqiamKRajPCAAAAAAAAAADg5R0hLyLAPH2gunHdgeHv2wAByLHHPEoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFJ0x9A6L34PonTO7Yt2+RfratTl89hqtqg+f0qhsDR+qpv7QUi73AIAAAAA69hg5wAR+Z6Dw65IxskAAAAAAAAAAAEVKs2qWrGys6DpgCC6TXtx34e52wAByLHHPEoAAAAAAAAAAAAAAAAHSHmxCJssImxCJsQibEImxCJsQibEImxCJsQibEImxgZ4gA1JZtDV+lvSZ9qfM7i9X5Oj/AEp1+cvP+nkbtp36rx7O3yd9gx9x8t7VotVz1+w2qtq65AmBhzYhE2WETYhE2IRNiETYhE2IRNiETYhE2IRNiETY8/QQAAAAAAAAAAAAAAADkWOOeJXHIws3z9JQsHQ7sbJUEAA45AAAAAAAKCGHk6uXafTX/sXX31VZC4eWuMpdi4tLj02J76wt5P8ApQMU2T51KHNh+2rpouqowxslRfMvXpq+TLv7Ve0I69sStDaW+wp/p8P432tv5n6MVm5Gnseyk0KZk8drjveq6e1z+i1esNz1oGwR8z76nigydI0lVRyFsymxxsNUo0v6o+Rc1bjS7KX7ltV3zLModgJxiVguSo8ltQMaXB5eqAAAdHcAAHl3OwAAAABhy5eHD88elkHflxxxWeerUjW8yXHPFAAAAccgAAAAAAAAAAABxFyoxMeTEdk5AxvHPqqymR6dzC9cP3I+Ti8gyuuR5HOJIxpL9O/skVH2UuHhTJMbJAAACnfHu96rOmv/AK+wLvctN7kJ8l/SMfEzeyReYAFcwLkWE5mhCZ2aIbL9ex3ipklXzpovlXZ/gq0vm5hFZWZilTnJsQvMyIXJkRxyIAAx0Dy3Zh1wABgQs5j+frkZvHPfmFgAAHSCsDGqlky8fw6zo9XDpVbVVfN29mW6YneOeOuAAAAAAAAAAAAAAAAAAAAGu9iF1pY7QNfytrGvu1/GtfbYg1/ibLEDPCAAAAAMLN8TQ+6ZTlrWmtPpL5zl3xMfKX06kgLkcHIAAAAI6q3stTWwa8z7phFI976K92n4eILm6R9SAQAAAAB17AAAAAAAAAAAADri5iORqOOeJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHTuNcZ15KCAAAAAAAAAAAAAAAAAAAAAAAHWHzqS9qraMX0HXCJloTnvLkKllctWNj5Hp5AADqd0Sj/8QAMRAAAgIBAwEGBQQDAAMAAAAAAwQCBQEABhQSEBETFSAwFjNAUGAHMTI2ITVwIiMk/9oACAEBAAEFAvXmWI4m5359Hf7sp4hgTGCz9Ux4JiMcRx+YMiJ3x/lj9u2ZZDMJvE/cIPBMBX8Gf2ecuiCbo3YfiBFYyz6JBkUwlYj+6kj1DVdmsZJyDoP+F4HxrZG2xVNDJEw/+FbyiSvvbaAgx2JdeMD0SliEbze+BZ2eUzFV97KxEWlz5KT8G38l49ODOdJOTrH1zxZB2HONUO495FtZ4YzPNGpwar05ziOPNE/D/fsrCzzu30bgLOG4vr4mjmXtzj1RKvMekf5/Z6zcTJNwbvu2ESJG8dTzNn4t3a8dBEGcyAuzZ2tptW2ZsRzngcK3crRbvVw88TcTrtttsoDRYDuy1OiLbVlmzq7o5FauLltGnqHc2NdYN4RS2vetMvujMZZ81uhY1STivsMrwaBbIyq7DOerX6f2XKq+zee5sWJo5h37TSxZ23pM8BYpBxMP4TruP3YEPb9yS3xV/wBwvLGdVXpMzbr5WF6PVPuEdmXcX9kLLoHt+3ncA9l/cJcPE3BY1ZITwSH0PFyQscdOPciKMZekjPhFhPBMfXtT8NbjZ+Hp9VrW7bL4tIaXH3xveWMqgx0hrq+djd7NaINjdz3Eq7DDMK2rcw+g9/ed8nhiupgyXqiPlb3FtNmSdvuL/SZiyOmr8hylvRuUo2LR17ARMFHuL+z+jP7J7kr3Tdu+KKT6h/8AxH+nZfBstb0ueEpDWMeLPa9Nior/AE7pz0XXZP8Ahsn+NX/cN4/6Ok/1OmseHvbcmencTOe5bY2cZT9mg/8Al3LvVkcaurHIVd7Jg+LjGO7H1Rl5FMIERe3jPf8ASsBwwAVGEVTCjAKpq66FUncbfXudI7TAqzom0R5ZqqVanHYUgrFt1SDytTVQqFrLbIrF1Payq7BIeIOopxU4W9vhas3lIvqCoF4VNTV4qVs0gpW1tVCt1UVMIqvUIn3/AE/qBQ5ExV70sKXFBuhTcAtfvrd+05LF2qXw7wxYgFZjy/YWlfhKOytsTjL1WVStbC+CktfBaevgpPVTSgpoApgL2O7bZcyeKiLdN8Fp6S2ooi3Z1C1sMmzUBjQo6a4B8Fp6+C09fBaevgtPXwWnr4LT18Fp6+C09fBaevghHvS2ogkb7i14ulPk/cW1Rur7kpi0b1GYkGqPduCS/fWcYlie0RCtdyM9AJSEIdBtsrbOMd2PcggsM3ozjvwBYKsfvuMd307HjdErd3gr2KzMV3AtaNcMClCyVnKFkrOEXYmKe3hzY2C0iDs1DT81g2uu4FrQrOOSZsQlX81WybFmAQs2a0WlHImxOyVHjLy+DevcVAHcCGKtijspZ6ZbW3hERuy1zN2zrNuYHP3XWuJhI/JX7KtmZxBfWZnF1eRrdgiwF2CTtOyJIzlMniQr5ZEtGWJY+uyWOJ/b+Cfya0rTsFqQd0wVWDNTrCzDBGJl+K+1qIWSQSryYCJEsIVESCSpxnDNhA89WCJiFgIwXTrveXqxMB/y9sSRawirUViqv+spYhGi8rveO4qh+pZ7tbG3L5gHQFRLe++obL1aZivB5oTXmhNCSOaoTJkl1aSI6N8x3xrAnC0VbnKy5DBhqsMAaTOwux0zjXof4S+oI5jGfS780TUh6GaJfwneUyR2/spfg3ZgjYFd/p3EmiKWO23qiyhbV+r8zia6O9Qz0s2F0XvyjicVkV0/QzXrOZGOAYHBBkYVhgydYTOPqGhklrH8sft6HfmiVkTQwxF+E3df5pV7DrCzu9NWiaWmN6UeMUjCTSmgWqj7W4qvys9XaEorap3OB37kReJPVkUcy+2TxmUeG3rht64beuG3rht64beuG3rht64beuG3rht64beuG3rht64beuG3rht64beuG3rht64beuG3rht6WAYWfSy0FMT28xAzbblsXiSjramziXJSmWqU9xbuYtNfp4h4CDyIrFa8oGaq3JPuxtvdX+fQyAxc8NvXDb1w29cNvXDb1w29cNvXDb1w29cNvXDb1w29cNvXDb1w29cNvXDb1w29cNvXDb1w29cNvXDb1DGYw/I9zb/XqCE3QR8/dBjTC5Ssbe2D06ddXqE7m6NdMCUkYtcnFBHTyIbEG6aNqkgCH/p2huLkY/Af21BjBCfYMuAxrGe/EiRHrDIpBjLE49cdQYGSeoNBJoDQWdTnEcYTiSPZAkSYwaGSazLEddWOrs8SPXqBoEl2ZziON172kxnIevS21LV/VN+mpO5CrVrBsHgqG/v5WTEm8hlsNPnm7c4xLFps1VzTm2barNSWObOv+xTl0xjnOY/R8mOSdmc92oyxLHp8OPV6J56YBL4sfqZ46oMRzXpks262PJdjNJyZqyrOwFhyeY27PigfLcG5ACyhGDp0KqxVnYpAsDNkhcvMaVZcdalaGgmy0bJHX2aydx4uNONtJ2JXHwkhYMNkzaMnWsH2Eg1Mut3saVG6Ae1KgeQJLq+jdlvFnPR35RqfOzmpBjpJ7usKUlXdr2sfXmeI6PaKrQb3GAUBbhSnCO5RZbzuYCbxH0ZFyYmIXjK66x7kGa4V6tIIrOAyUu4Fm9XNnNE0b1XKblkqYbT0GQJFnlqbYR4YuwQsG7JYkuclyJXaUY2O51UgCJ4ovdITAsRliWPbKzEeiHkXS3z+yf8ACM5DyBvE8/ZM46sDqkw4koGehVqoMZrls4wuOM+MLvgguOMqlOc8Irx0SrTNgqC5wmpAGYNXKsDJWKGlOrTLjFcriHlkORMMC5msIksVScREolyt5TBLWaZGWArCX9jdd5ihqGWzPlrhtmboKaNQpreW1JOEC/Ndyit43CXqt4MxzX7fXxnySv15LX93klfoKK60MUyGNBRXXHIcZ4lTISzmkD4/kqGdQHAeHymVcxWCYj5Ih3DqERTYX8YOaErs/JK/XklfryZDu8lr9CrVAx/b1zPGGfU78qBJDyA/i49mceuJVZD7Fvndk/4aD877WveeKaLQZyCcbER2oyWaDmW8QuolgnajYJlwWdYsA4hFwE9NWowwEYZ4e7vg+LJxSrmyShp1KbPbZbTRsJ0W2WqSx9w5vAgEuDD9EmIQMyxBQAnQHziWJdip+SP3DRlKPRmJPU3HMhiT7tYx3e4VWJNDDIZ+yf8ADS60sz+1qVTKc4JNkcqotLpeStAEjXm0jWtV05VZpCwm7NyFQbIy1zAMr1jMpVislSe46xhRStpGrotfWgrRbvreqNPu91KyrbUFqH37CLElE5WdaPzKz15lZ65NyOwy/a5KwK4fPItxxgJTizzRxAB22Z1nBa5b3cxxL6mWO/Aloj/BSigeGMd2NEHEsLra8qJuotjIsIOjsFfo4pAgftnTpFZ1ivWwx+YThEkH9kJsY2zSt0mPuRDxFqOerHa0WQyibjP/AILLPTgrmc6z/nQ/l9r3zNCZkLQjYNj1Zz045fUX/8QALBEAAQMCBAUDBAMAAAAAAAAAAQACEQMEEBIhMSAwQEFQBRNRFCKhsSNgcf/aAAgBAwEBPwHECU4RgBKiOLSOlILTB8WDC36uvR+oEt3/AKPYEvY147L1S39up7rdnfvC1tH3TtNvlX1GnbUQxnfrmgFO0OMT0IR2wCI1RwC7ooBDEuA3OHpVyKNXI/Z37V+wvt3NPbVUKLq9QU2qlSZTaKTNgvUbgV6327Di7LdFHnkzygY4o0nmzwTyLmgLikWL0/3WsyVN8KXqGakaVb43VhNJpeNyru9LW+0wye/BKk4SpUqVJUlSVJUnylc/c0NdDv2ry/dQrQ1Uara7A9qfcnLkZoOZHPiMcunhqryyu0ZZn8KvQpVh/KFa0WUJFN0jAgKI6gGE4zjm008MdRoqtpc1q+X8q2tm0GZQjoECtCjp5OFChRhChQoUKMX2VxVqe46pH+L6Zj2htTVNb2GG+JM4woUdNuskDANlER4PKjgTPNniaJ4AQBrxAwswIwYnnp5UqVKnkEyhroiI5c9NPhp6kCU4Rg3dFnxwkQv/xAAmEQACAQMEAgICAwAAAAAAAAABAhEAAzEQEiFAIFATYARBIjBR/9oACAECAQE/AdWO2rZLZ0ZttAg48jM9UEESPUxGjLuoCMdu2xtNBx9HuLDGrDyI0d9lWizvLdjPk7EYpORqTGfQ303CRVowwNOwQSaLyZNWU2r2AoX+ojdmseIbmOypg08Txo9n+QK1+Q0ttq1bnk4+hiktyOaIjiks87m7YIONfkgwfTASKBIxTGc9thupF26/HJk+mxSuoWmafTCf3rnt7lH6rdGKPoCYzXySYGjPtNKZ9HPWZiPB1Jbih4sgathU6XatCB9GgZ9+zBaRtx0fFLc/2s+AYHFf/8QARxAAAgECBAEHCAYHBwQDAAAAAQIDABEEEiExEyIyNUFRk9EFEBQgMGFxgSMzQlBSkSQ0QGBiobEVQ2NwcsHhU5Sy0nOS8P/aAAgBAQAGPwL17nSrJ+f7Fc6UQNvXsasP3xueUKHqtY1ZtD7Sxo66fdBbsF6zIdetTuP3RuND6rWFa8o/erDtFcSM6g2PvoSJ8x2f5GY3Cn7L5l+FZpHCRbNc70rocysLg/5Fpil5MbrymrQ8SZxqx1sK9BkPKTWO/Z6pJNgOs00OAsx65jt8q407tI7udWP357+yj2fuPxVFyh1+FFW1PvqGdDqrXqOVNVcXHneWVgkai5Jpoofo8IOrrb41a1YaLrC6+tc6ChJ6VFkJy5s438+OUuxUDa/q+TFDsFO4B9/3AV2PtLXtXaO2j90GOaUnDOxRRbQVFDhZDG1szkVDJ+JQa9F4p9HtzKjaCQxsXtcVGTuVFYyBPKDQCLm8gVOmJOd4mtnA3osdgLml4zn0SZiqDq8yYCDFnDxuBsoNqjeecY3CsbarY0kqc1hcVFDhWK4iQ303tSO5zSryXrEyxNlkVbg0PKY8oFuVYxMgqGdhlZxqKmnP2FvTwYxy3EXMlxTpBJwZTs9r2qDCHykWMv2su1P6XjPSr7cm1vYSQuLo4saeNxzTai5p4GN2hbT4ec4SA3w6HX+I1qL1GoX6OPltp6yRyyqjvzVPXTIwurCxoQ8NsobNzqsuyjSsRxEVOG+UZax/wp8Qih2B2ao58ozul7USfJkTr/DJ/wA08DxNhsSm8bV5K/8A3XTN2C9Su6KhR8vJ9l6F5Pw/pOIHOJPJWk/tLBxrC5txITtQZTdTqP2Ik6Cre1zDT1rEaVcG/wBwSt2KTUWPXnpOWryn5Rcb2C/KsKexbUpfQNtWGi+28mgqMdiivKEaYmTDb6xnesTgDlZE1zgUY1+smOQVhAfJ0uG9H/vj1/yqGYfaXWsP8B/So4f7x3uBWFjfnKgvU2Jiwb46OH6MKtYjCSxtBxeUI26jWL/0VhnkkMmAaTWIaWqE4ewhy8m1YfAxKXeQ5iq7msHjGwEmCEdl5X2qV12YXryf8vWMKziOcGxil5Lep6TAt5Y+cO0UFqRD/ep/TzeixtaWUa26lq9ZFXX4UMwtNJq3reTGOgvv8/O3wrH/APy1j/hUvxFYX/QPNARpmXWvJZOg7fnUp6sprE6/3nsvKEMnPfauCSDK7DKvXWHRucEHst7ftnYK03+4HiJsHFrij5PzM0R6+umwClhEwtfrpcOjs6jralMhaOVdnSlnlmlxUi83iHQeaWaPGYiEyc7IaIgBLNznbc1BPK7/AEOyDapIJOY4tpXASR5Fvfl16V6RNBNa14zQnleXFzDZpmvTLcrcWuKdI2Z8xzFm3qPHcR45U/D11Lh2JVZBa4o4Alni7TvXAWV5UvcZ+qv7QZ3aQCwU7CuBKSove671HAHZwgsC29Q4t5HVotgPWHlGEch9JPce2gub0mAf3cp/oavFeKUbxPv/AM+dsbhlzYc6sg+z/wAVhfebUztoqi9SSYiRvpDyWGwHZSCObiO+yBaGNxa2UfVoev3+uExCZrbEbivrsV3g8K+vxXeDwr6/Fd4PCnWBnYObnOalxql+LJuCdKODhfi4hnAyr1VBhJ2dMoF8hsa+vxXeDwpMQkk7SLtnYH/aguIS9tmBsRTM82JyKLnl/wDFZsJxo+HySQ1ia+vxXeDwr6/Fd4PCvr8V3g8K+vxXeDwr6/Fd4PCvr8V3g8K+vxXeDwr6/Fd4PCvr8V3g8KvxcTftzjwoS5XmcbGVr/eWnN91D7ykglXNG4sRTQPqh1R+0VZWso5VCDGH/TL4+ax1FQ4zCtwgrZmiO3ypIfx6miXUWr03GcmI/VxGrDb2plXDxrKfthRf1bHUVlhiWJd7ILfur9AEL/4m1S4nh4dVjfKdT20xSeN8g5Vm2o8GVZLb5TWLcQxtBhms3K5RoLx0zn7N9ad1xEZVOcc21Q8KWJo3v16n4VhoIJY5M7lXtramQToWXcXrImIjdrXsGpjgWWaQG1uymEUqSFd8prFCYrEkL5MxO9SyYeeFsm5LckfGmg4ycdRsai4+IhV32s2h+FejmZRNa+WgrSxNLvaM9VAtiIwDtyqWLjJxW2W+vsDC/JkGscn4TXBxKZJNvcRWm1LgcVJdDokh6vd53CDNbkgClnxVncc2PqX2yMZIY0vyjM+X8qWTNE9+uFrr552la+WVh8qKRYiKVxuqODRiE8ZlH2A4v+VRtG2UmVV+VYuIteNAuUedlDAldwDtUqwsplXTfY0wmkXOnPPFz28KBBuD1j9vyk6/eGJh4Z4jSkhfdepOClrwBey5vtTStHiElKhSZ7fytWMbEI2RpcyjMbN8q8qqqZHmbkHtFO0uHxvEyhdStx8KgMoOcLIuc2B916wEXokkJhuGbS22+9cKaHE8WJWykleH8q8lfRWMV8/u0p8PLA6lb72s3wqSPLKuEH1YmtmB7NOqsZ9ETnxKMPeK8oFIiRJEoW3Wb1iRwHZZowA4tbakwwgfLwbfRhd+w3pZGw8hWSFVuLckjtrDyQx/pKMykfwmuZPJh2iEf0BHzveo/RI5kU2EgexQjx9g0jmyqLmsRBiIxHNC14mXe1FZk/RzzZE5reb0HEN+kRjkE/aHmPDSxO59vDioUjmyKV4btb5imilwE7NnJvFlI/rXR2L/ACT/ANq6Oxf5J/7Vi4+GYpJHLBH+NRr6M2GMeHsVNu33Vlj8nT8VXBDkIP53qKNcDiEIkViz5bf1rFyFbI4Wx7axcLtolii+6p1hhnmHpOYSIRa351ipW8n4nLKwK2yX/wDKsVI3k/E5ZnzLbLf/AMq8qSyxtAJCWAktfaoP9A/abLr63yq24rQ/uTiRFozcmoWzZnfk/CmjlQSI26sKMnk6Thn/AKMm3yNRzSQSQSRtcMdj86hxUezjUdh8wxOEYcjnowuCKAxacE/jXUVxIJVlTtQ3/YCCLg0eBCkV98o39QGeCOUjYst6CIoRRsFFGOQZlPVTlFy5zc0BLGsgBvZhf9puDdeyh69zoK0H7k4jDdbrp8akeRWVcNoQfxeb9IxUMPudwKKvi1kHYI2b/auLgIuHAx6o8gPmlwkTiZkHLy80VoPoH5p/2ovEzLm00NLHMRFMe3Y/eV9j62Yi5+7SA2U9tdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FdIP3a+FHiYkz/ABUC35esZJpBGnaaf0DDqWbUyOLX+VFXxj5PwRnKP5eYT4gGPBD83+FXYrDBGLAU0MF4MN2DdvjU2II1law+FPBKLq38qyuORzkk6mrMKjwuLfQ6JIf6H1Rw8QYPgoP9a6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18K6Qfu18KAZs5/F2/vIcPhVGJxA5x+ylN6TIzX2Z+qvrRJ8DUUcUbSu2gVRc0s/lPU7jDj/AHoySWSNRoo/oKzSaRjmR9lLGou7m1QwL9hbeYwzrmU/yrNGhlw3/VH2fjSnrtQwOIb6Rfq2PX7v3DygfcL/AEycjncrarjahmYLfa53riiReH+K+lBgbg9dHlDTf3UVV1ZgL2B83JlU623puFIsmU2OU7UWZgqjrNZkYMvaD57qwYbaGjGGGddSvmFyBfastxm7PPkzDPvlvr5nVWBZOcB1eckmwHXT4Tye+WLZphu3wrtY0ODgZbfiYZR/Og3lGcD/AA4N/wA6yYeIJ79z+dPLIcqKLk0XIPCXmJWYx6H302OdCEj0S/WfUIIuD1Gi2H/RZP4RyfyoSxwmXIbh4OV/Ko5WQxy7OrC1j9xk2vQuLH9kCjX1NNfWzW19UmtrftTC9rjesRgpIoi3CzRzoNWF+upUZxPaJGQ5bZb1hxiFGVpbKXC5rW91YiC/CWKNuSRq/v8AhWHw8koljeDOOTbLWKWS64JmXjMu+39KxsmFlWFY4FIGW4NQNHLmUsqvHw+SL++si2GZp9ba1Bw8SWcR8ThiIbe81DkKCQESBX5re6oIcPlwNw+cBAwBHZUMKaykNy4wvKsf4jTRNKuFaFVzKFDZjTcOUJKGc5I4hqB21iJo34MjRRaigjS8bipaJso59eTrZTNxRztr2qWWRYuIIQBkuQNalgjkGJfhiQNlAIqNIMXkXglmZ4he4NTSZhFIIAc6r/FSZMUZZFUOy8Ibe81jz2sp/l52hmXNG24va9aYCH5i9fQwRxf6EA9T0WJwVQ8ux66zyWUdV6XDp1/aHUK9Cw30eQcgjtqJGkE6ZsrrKLn86+ja0nWh9gLnenLTx8ndcwvX6PlxLgXIEgUD51GzSrHnTPZmHJqOMx5YJNpjIv8AMdVSCYS8N+aVkWQD5DaocR6a3LIAQTWHzFeVHixRkAZSljcConmGaVtI+VbWozxVaZhzElCa/GsOzyIjy/Z4g5NeUPpllObkASgdXVelwuZxiBpaQ5r/ADFQ/QTOu94mGvyrjs6p18Mut6MYxix8nMWRhWHEONPESUAkEXb5VjRI11Rxa/ULUC8qJfbMbVHw2Eo5jtxgFX5ddK647hiNrWUjU1FN6Y15Pscbkj5UTx0NjbRhSOhWZn2UPSP+IX9tc1ca+07TWu3ZS+c1oaAbQ/ctjqKcJho1D87k70c0Sm65TcdVAR4eNADcWHXSjgJZdBpSsEAZRlB7BUh4a3k52m9FVhQAjKdOqs7YaIt25a0hTr6u3ekD4aNggst12pYZIUaNdlI2rDnhx+jxKRwstJHJh42ROaCu1Iz4eNmTmnLtQD4aNgNdVopwEykZSLdVQEZVgg5kSj7XbSl1DFTdb9VFmjVmIykkdVNGMNHkbcZajcxx8FI8giy014kOZcp06uylBwkRC6Dk0eGgS+9vYSTj61uTGPfXEa2b+HSkjjgOIlc2AYUAQPSH+sb/AG8y43DDbWSMdfvrNA1pU6x1UJNpBo69h9eKfDSWZNMhjLg/lTT4iGGSWTq4VgPka/UsP3Yq3oUHdiv1LD92KZYoI41bcKtr0f0KDX/DFFIoUjQ7qq2rlKG+Iok4KAk/4Yrk4XBjD9amHlV+pQd2KAVQoGwAriehti4GTKeHzh8qWSDyfh8KesYiAX/ka/UsP3YoOmEhVhsQgqVFPDZxzxUX9oPBMse2SOzH+dfqWH7sV+pQd2KI9Cgsf8MV+pYfuxTKmGiRW3AQa+wt1+v860Nai3srVfnDzL5z5k+I+7Iw2HKRyOY1fNfUUyrMjMnOAbas0UiyL2ob0+Dscyi+bqPuqa65ckhSlyRFpmcoIwezrqSN2jjlVygTNqakVJY3kQXKZxp8aUyzRRMRtxBT5Zozk51mGlQPG8ckcj5C4bQVnidZF/EpuPbDD7pD/Wlhw8V2PZWTiRvjSOVrr8vUeQJ6PO27x9fxFNIMSkuHYWZbWPtc3DeT3ILmgwBHuO49VIieW2wtTyyGyLqTSZJA2dc627K082bKU1tY+15JtQzdvr2Aq7/lWntL7GluPOfMrHQXv92RYkRmRxI2aJmvYHrHZRebBtwyjoVjyKPl/wA1KHjPJ+qVsoYj320qHELK8mJR+IYuTbXepS8kuH+lLZUK8oU2JjjzO7kSREjVb6EVI3AHFOK4gOl8tGRsKVGSRORkC67e+ps8AY+ihFvbnUjQYVCfRwpGlr3q0mHbKcQJOXk2t7qxl0yI0uZPh7WWY/YW9cUjhxE3MjVkiX4sdzS4xRqmjWp4XkbEYfqV+r51nhbUbqdx+wOMKVE52LUYv7P9J1zZxOP966HP/cpXQ5/7lKzHBNKh/u1lXIB40rDyZyRvH6QtzQeNJPJ5H4sQrJ/9QKlw8+AGKJuvFSVVB+VYaQi2SHIaxRSSONoyV5R6/fUN8EIkNs0nEU/O1RqJQjmfRN84J29tqP2kiu0/uLkkUOvYasNB5mRxmVtCKlxS8vDN9r8PuNLiIeaDqO0VHPEbqw/ZDMsKCY7uBr6nHfDRtL+IjzccQIJfxW/fEq6hlO4NfozHCHsGq/lU0Us0csDarlvcH7z1q/qCx6qs3JP+QtzVl09/mX1B8PN2jsrT17mlVdr1/8QAKxABAAICAQIFAgcBAQAAAAAAAQARITFBUWEQIHGBoTCRQFBgscHR8OHx/9oACAEBAAE/IXfnuQDvK0sXVoaPIB039W6IICOBvz8XZQig4P0g3x+JNx357Jnt8T5E0eREqzriV38F9Snt9O0ZRZnv+UWFmyNNT9EANx39AN60cwKPJqCvfErH1L+asXtCG89BwL1E07cq6foc3Hf6EZVYvqMyz+4Kj0d4YUQGk/QxuO/z+vLht0DfRmqRL4AXFcjL0eUIxrUoIQI8Bw9HPrLXTcx/PA8t9CW7imA8Dcd/oRGqsU65mhD1TDqFL45IzVKx48YVTBBrsUfJ/pAWFXjM6al9TnzOEALV4nQjWA9EEAjY6TwRoSmqPbykKTIA/kC3lOKfqIgTeSMW+knwfA3Hf5K5RdgTiCWNLHHBmI42qPeofZ4lagz1IDUcK0F9pYqFAg51xALaLPhEHpydpnNQQBmhHwotYtgT7/MsZ6IB/T7sdyzyU0KxEGW71ZyvWaSlsafeAKjBCrgzbENXGhoQevEZuUZFQTYaf4EqLNRIfCWdXWtB9DYyEmUeLLdThjcZeI2J2tu+vBaLcE2lSGut6QFm7KxK9GR7NE15d03zn0S8MgdSdy93u4EhVEekTeWhk958pDJyMlZlYjE9X0lcA6d1H/inLz4kKcWvT2lddAtn6TsvGKG54hv7mVTDZ1PpLWVxDPnXdn92CIzXX6lRWNnfgbjvx2k6yUxD8g/x+Ea1q+c1cFP2ueCM1W2/aE0qgnWSCtsPUiu7A/aKpxWNtp7S9lUUm7rLzFe6ybrmXFDd9nqNMxjrq93M/wBXql6RIHdExIBWgxgVaDi9Mz0Bsel9p/i7xftA+QeXvAUSa8CcCT7BomWQqrAexxE+sgn+jv5VSavsRho9we+/bydN3W/+MAdEQUYT7vDqqCs/9pRuhTogiZTSkAY+w+h5jW05LUb8PmPCflPIvwZSPDnEJvTygmEBmfSUkFz+PpPTczeS7mDQx+U1Kg36fSqs0SpOh+HNx343o9WE/eX6YaN/hXcMvYXHkARde+NOomjnzqOCVSm8+k0WC7Po+NPVDI9UiXfGOJsGwblk8l0r+uJYllHYmZshhj0ohEkAAKrpz8zKnTBH0/ubrlyCImMa2faYFKxWqepLyYe0i5vbjq9SMuGA9hUC4KC9rER0INVGYGzjw9pV4LDp+PNwIUD0fdOD2WGj7h+04/Rqns+BAU5JY4NNv1jE8H7OIPkCy43xk6TsnfUZa67myTA5XV56ix26vQZRgI6HiODDEcgS37BEMsZH2lQ/qgS4dYMjWswe3hw4sikhfm/70JdxQE1RF0gVuV3u/pcOHDhw4cOHD+fogC5Fgr6UfkZuO/rPL8zaBkkyGSq6Ka9yr05s1Aci44Xt/aCARseY4ATCPMPd/hQr0g8ivYI8zXSXcVG90q4vtAIAGAPqvmi2y+/lBgEwjzHaI2CF9vy43Hf1wFBX4dDcnJKe0WRIudxRdTMzCs++B+s4qEQDcgOpivaCEQu5pi2yZMBUKiiPPQv8uW4AFWoQN1KZsDf2jEdtMtdYhLGzheV7biWBbOqHQyKZYuOxcMs+iUFnK1F1caTm/wB0OJjsCx3eogBDkhtXMb8qJGa3ELQXTt9CpfXH+CH3WPwSPJGd9Ql1z22/U9JvwYO1tbmyl9veer9a95V0j+Udxtv2k+OPDlQKDNxYQD7RE/UsH90tZINDk53L0x6TFmfFYfVcPq6SpHGnTYvpFBV3wubWvZAbGsSx/H4EO76BuO/yfNmw8yi39pZQLwShaATYJ1OIN6kpxVtDT7wufCRiOZQSb2JPS00ypQSGASmDT6QGOVsa0pVk9oAoLyYjmmW4IiIK1vyjg9u4BXa43gJRHKFs+qUoDoeHbMRIGYsoysI1EqjmUTVuC326HpPXM1wNsSzEbLm1z7bggtMzR4Dg9prX7tTd3YPoXOGbsRIuNd4v9kQ0JXzh4e0qFk3ryln+88LSDb2L7/Xt0scryU5mTIGV1vCn9vEQIvwvUFMqaXccX7JXWcQpjo8U5SIhMgqBzpxbwvtjMBfkgBEZe85c5AlyCiMmGFworJpFXABeAKyaQ00isehYETh/h/EKBbgmy26viDYeXRFSvfhHN0d+Y3Hf6CTjDt2WKpvlaCZIaSqsBi522z/k95QaQn2hhjcf2QPCsieN6h1+ZVonL8Oz5hx34o/AAGFSPJO+2jH1eTVhQkQzd1SB7TkoqyftLETZrbKGzFIPWBRRg/EZYdJDVxzNHl0+kpoZFZurvzG47/QQUxdz+yEEV9kB4WNgck+1xv8AMJB/ZG4nXYOUKJqW631XZirirne+lBXhLMT0s5lN6AOD/wAfmSVjuEMHl9xx+gbjv8kU05gl1+InTp06dOnTp06dOnTp06dOnTp06cilJg+PPMaKcv7dYVoGGF1pl95fwTP/AFL3iOXmJsG7cdns7wnWaMAcARNL8WUfd/EalrB2f9lRNb5XUj1aSoYT+Yg6kuoIDaUNQ35EU4Ml/wDZ+InTp06dOnTp06dOnTp06dOnTp06c8gTKA+H5Ebjv9A4UxXf+jFYB2T7aOICs7Kr4uZ04KSC624LD1/wRwqUXfQJbK5jcD+5QoAHeGlQC7vPgJn75dRluyxV8HHrqWJepcyQlkZP8vz43HfioLeJrKrb9YK/Bkp9Eff0gElrIx4vOhRbtGDBFeJ6wARrByTIcmq/lCzoVqh0+CINqAHKbPad15ZbpNqJHoIfRtXh8Uws2bs9InkQByDrweCiqztnbJeWa8RXgi3A614JVSkZXfxNsK1aCPoPjez0HeWtPRZYzYLXz+hAVrzs9zP2PeGxoU7vqs+DXYEPYrNH9zt93TLufu16p6eQ2xqQsZbq/ix/w9o+67HPu+Ibab4HePyNCEzgjJYGT8GtFuCG7Zq/GgrqW5A7Q3HfkAqprZ5aw2Fx7l/t/FGrShTiM8KDYL13HKlAblXXJ6xRZaPXq0PUlSqrma4dkImoQ4sV3lMCOm4D0XLKEhYSmjsQSg6iKOW3fpDuSVyiujxNx0V1bqFHzGQWXtK2I11U3QcAlUrwUMAV1qLPAeE3vj0iKDZK5tWAfMc6lT1bmbTzBOfb1uXMb6FbNQUxpVlW26lVZqsbkDT2uW3KmzUyaIc6V/a4WPSAltwLT1ij0zLBw0XjWBjXvggJcn+tz/Ac9PJqp4uuEXQ9FVQ7VWaHvSlbnpprz6sy8DMB2tcr1GXte3X6DZoVQdZdHanxLiilY7HqcvYuZXaPYD3gsLBuXq2PWcYsIRzv+UJQFIT7uoMf4O7S0zTbAs4bc6j+KEWI3dsEq4YNy3dmmYLkjyKiWRz9PxmVIOrD7hWUhC/mRH7Me+5RNdDO4LoHmfPdG29AUAe3Onf7wdUoS4ZvP7ofHM9+bU5vGGdHNqla4uYVPfUBS1jFHdzUIkoGvr9bjLdS1IO31LcHtk3SuhPk+PwZeamAla16x39FLM6gUYx+KNAEKR5hlIoAw6RZ6Olvp9JX8FaeqJ1QR4jslcWKM9CKMQKbp7yiQ+Nuj0hcJqmLK1KihWH+G5WCxE06E6TBo9EeBcDFeZpIIlenpCIwCCwajgIQA5dwTV/Vo0RqYZaGF10UNupMveIr6PSEUtdbPSMfO0F3dwwCUSc/xQikUJwRB47hq619CgRzXlf1MX1rEf8AqWecIX7/AMxyQBDOejseFvJdRnsfzCisl5ECdef4EItQhe2Uy/RSvfq3P93/ABOkO6/4T/d/xMUZjx6qgwBNuT4iLdsIL7QsBGQsqL2q1cnxDG61W297r4jSta1/5wW/VRBAp0lHL1bGXmhnLO2r3hSuw/1qIp+xyfE199RkesZKJEoThXTsE/3f8RT/AHfEDByhs+It/r+JkZQUPVAAAUHHnHttcH0FcKo+ZRzx9K0sl8kuh6hvw+X4/Bjuf63WO/ytSydm3WOJr/U6+s4iwGaoi/aDMq7mc+oiIFIpu65hhk2ZSpbwRj6SOHkJZUYFn8ELxZWlX0eZ6kVXv6QYjQKXWyGkvQ/uH1h7WNkvvhvOMaDux8i66anQbryJEycO32GWZ/hP0ayfP1cTyamLEjvedHytDDW5mu8WMekXRAFnvDrhFoTtFoeZ1XHIx9Wv34Dgj1Q15sjTcOmRgDQo7fUux65NeV7NePwZzMWQMuY7/KwMwihWL2l6QwXZbNYN+8L/ALarRMF0ZH2qjdI0OurxLVrnoE64Y7SxlbgvD2hmI3UDdzDbRAKaU294KOctdwQESbl3avLM2e+rmw69pVS8BVNOA19V1aEi6RsLfoczCUv95mm49NwysuLysemxPvSGe/4AtyU2g+GAepdHM8cvFxzH6WguBlD7tyv4KZc63Nbm37hFvrEDNAmVhtmD+0/rK0ESGAQ4RfBnfk9ov565b60NcNZ/E8GXMu+uw3Hf6DUJOzsYBABgDwJiKxyRoG2nTgoaZB9qZGjejyeR/Aavirf38maU3k29ZqCwHAcz8pNx3+hzWPQ7E9Ioeh//AJPvFbprORh/Myss9CUulnkRauiVn8DN/RNx3+uhTAEvcKEq3LPieYkqvvJfbDyPnNNBFlKZFecz/9oADAMBAAIAAwAAABBb/wD3e/8A8P8A/wD/AP7v/wD83/8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AL//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/APDW/wD7/v8Ap7//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wC9bf8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/DW//wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wB//wBBf+kL/wD7/wDv/wD7/wD/AP8A/wD/AP8A/wD/AP8A/wD/APf/AP8A/wD6Xw1vP/8A/wD/AP8A/wD/AP8A/wD/AP8A/wDNuTLt2TdJTr5ff8/LHrzu/wD0uttbPV//AP8A/aX/AP8A/wDq/wD/AM//AP8A/wD+/wBDW/d//wD/ANL7/wD/AP8A/wD/AP8A957/AOuOv/8Arnrv/wDlD8OzH/8A/wDvblbe3PfffXf/AP8A/v8A/wD/AP8A/wD/AP8A/wD/APDW/wD/AP8A/wD3/wD/AP8A/wD/AP8A/wD/APdRYgAtlZMs+/8A/wCWNx1//wD/AP8A+5uHG3EnX/8A/wD/AP8A/wD/AP8A/wD/AD/+v3/8Nb//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A1vC9rtv/AP8A/wD/AO9/+8+//wD/AP8A/wD/AP8A/wD/AL2P/wBv3/8ADW//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wDPOOOOOOOOOOO//wCeBlEfwVv7zjjjjjjjjjjv/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8Aw1v9P+dP/wD97/8A/wD/AP8A8+3FlY9Nx11Nx138DsMT6+uM/wD/ALH3vrDr7rbrf/8A/J//AMf/AP8A/wD+tP5T1v8A/wDv/wD/AP8A/wD/AP8A/wD/AP8A/Pfv+ySJySHOf/8A/wD/ACuuU/8A/wA4456/6LTq467/AP8A4l//AMbb/wD/AP8Alz9YFb//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A7vXfbfX/AP8A/wBv71If/wD7/wD/AP8A87/23pH/AP8A/wD/APvf/wD/AP8A/wD/AP8A/wD/AO8Nb/8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8Av9//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/TP+qf3/AP8Az//EACkRAQACAQMDAwQDAQEAAAAAAAEAESEQMUEgUWFAgZEwUHHRobHw4fH/2gAIAQMBAT8Q1JUsKgaPeorB6jJ36L49AF4jg6T7I9Krvo96iuT6oazBE9tnk7REafsb9j4TFP5O/tT8wCDueOXzv86UDA79n7YfuVvy10hd6pQPoETfqQywFBHQWz6G/wBEjvBUVklczYEJuTkKgzEqDiWH5m+ot6PgQu3nRQ3F+OHzt8QxO17b/wAXNwB/g5faYSf8K+ZSleM8933/AK1SgirvEpQlboVwmwgprposK6sV0Lu61veOiKyKrb0tMn07ZbLVUFNpbdy2qltpfEtlstlpnV04eHs8QJsQu67bf+aO2zYO7GB/fzCJcJ+PHvEd03dvBXPd6BG08ktmwCW7wRF8M8k8k8k8k8non0hXMoq5iUSiUSi5RKJREroAvg2HYbnxBp7Vd8/7vNkt/jxHnGFXy/rrImZXeVmcQion1VbtRoSJW+r9iEfFvwy8e+8o4Ic7J7xy1OLFPj9Qw3KAkVg+oRWQa1rcBC3vq+kuXLly5cuXLly9VDeJyqY1Vp3OA/3G8NZHl7ytBKMO0XDAqnS5cuXLly5cuXLl+idVFxoZxEpp+qF6GmolMtqFtRxG6xPgjHB2Mn/eY7Cec4z7f1tCKKgiUYiOcRMMFNpSzpUtLaKuUym6lMqAsplL03rTv1AqiZC6VWoip9HcvTLMzMzMzOlst6RJlxFWBxBqAfPRbVS2Wy2WkthFZmWlst6BFr05NLjpfbLLTnCUr0w1G0sy0tLRb61h4Kbw20cdQ1LO0s7T8JfeX6QQUR+y2Sn1K7YJNCNGc0JWHoSlz//EACQRAQACAgIBBAMBAQAAAAAAAAEAERAhIDFAMEFQUWGx4YFx/9oACAECAQE/EMuLC4ouA0uC2uSrrrhRd+B1ASWPwhxBZMDS4BoeW6/k/Pwh8Huv3r/j/bm7+36wY+36jxOj/ON+GJscg9I0Vhgd4G9ngMO57Rg6g4XUHUIu45BesVncfqD9hqKZMnYzdJt3n3x9T3nU94dcfa+QtonDqOYB1DBioAFHGx09WuFehtp3IG4h0V9SmHR+47Dr2fn+cKlEqVKJUqUSiUSiUeEeI43Lludy5fEabNQr4Z2gj3q3+PSvFy4eqqnszRYCJZk+CsW6qOw9URgvTBvyBFMdo5QsAAoyfBLbcsEd3DbgE3BvzzJBgtFsEFnA5/7m5cuXLly5cuXLyAraCV6RVuE61LuJcCs3LJcuXLJcvFy+NN3ebLrkBtRQ9GKATUE2eRqamvRoTveAThXGsa6xXJ0o4WeAhS3x7DuUN9XjsRkvxqlSpUqV6AVErcG+/SqVKLuVzq/VWbQ+Fo8ntIrXhpcnsyILM3UubT//xAArEAEAAQMEAAUEAwEBAQAAAAABEQAhMUFRYXEQIDCBoUBQkbFgwfDR8eH/2gAIAQEAAT8Qyd+doM6qilpSDknQpyzmPJiSFpH1UYRq69Uy0lDy+cgCzmBiaAjxgg/iFotzrtx9Tg7rJ35kUQY24omkw4Dqvjv3XwDyMevzkvaosD2mbumhEtc9OLMav6Uay0Tb3faBCIYDWCaTqLMQTkP2fwjB3WTvzpJDcoGIWdD2VAGxHkGMnLsKDszoOisfdMTz+0SrfAw2CFfijT3unlr/AF/4Pg7rJ36oAQEfd72QJN1svssUJKNqDcN0cUkij5USJ/BsHdZO/v55QCBkJgsl7WYamUmop7ybTxpUGD3oH25OHyuH4IAZVcFT4Cmic3yW4aRpSqYGDODgt98aG3pf32okIfgWDusnf35z5pDPkKiXeAYfel2viUqMBekSl3V5whOpOaPCgCSEnxdmJuBVJR1ake04cmjWWiXEgZSnYoIeH/cpPz5kPmTgBlXQr+soVLOeKNsaUSJueEvQn2LEoPLqwlKbIMPv9gutnQT16gKQ56dG5W9+dq+K8MHdZO/siwS4ociBoKIQMQl96XKBSCYSDG9q5n3ghL+aak4ScrzE55pA3XiwxcaVW62VQrSsnNKEDiwtlmojn5I7kIAm2QLUWp5NASv4KtFVeZAALCRnXwvnSnBVwLGKT+WODUsTBiw1NgocJNCvgDRVgRzD+Klhk0AOEFrlOzaCyYvARzqU/wDbEAQkYh6g4aAYXCjZjig5SA1hA/KVy2KScEBZMdVnA9EznlWXRo4YuMmrQ9BLGW11fQJkUCbJn2z7Uo5uQtpHZFGEUAG1WehKXJ9g28AZACVWAKsSTvg2bEs0oa22WfZb0nVRYCFcSxLGdqAABAYDytAKIm/Fmt6vGqeJCEml1Iw3dkIu0ERRBbsZgEB8Uphf81Mm/Vf7PFEWp32XCNIIaLpOWkuJ5ptTViT4EleigYcq5UMqgbaiFf7OVC8AlhRP9Uu7DaBEyy59Ijg5+GRuTGqp70rkSEHyM8bW4mhUFhwhI+kBQA1WClCS550ku7n+ClYQIlS+ohEQR0ai0uww+GDusnfjNzgNw9qG9oY+wXxhOeRtBZqwyVs8SfNJSXfttMPbFY5InKSgnW+abN/agkwhbixMdtCDBE6ICl1+EMrLKTwmj9P9oWoNXMpvS0oGdLI5iD3oioU2lRmBddmpLxQmUJAeZ8GyjvVS8lja8UNSIMhif7p7db7eTS83tQ4jEoGTAlVGNK+T/SisEqd0hJYTEtmn5g4UOO6DguTUrMarNGqB1xEzabrXoUDrGbJJXxP3+VCEwUgl4JofXlRFhAs958hKA4DZ3nl/Sgvhbu9qmAYJrKH78JdL1t1FzDh1Ut0e5iPy0cvQJZWwWy0QkiIJMfCZ58wRDCwHahAIiNxPD/I2r5z9Nf7PFf4W7X+dt4EqA8WXP4o6hIUgGetPbTUgCdGcwwG8Nj6RCLrOlMnslD3LMmxvDOse9D6h7kPpGEYADZ7KmtlAt9Pg7rJ34oIhCXr0UngqyrvpLGbUDJDcZPpYFfEwCFJqKhd6SzC0DPFIHCcFCpgTJtWqmrpTFgRR40QYJmBESenmoCYsRUwxdY0vHHgfr46VLIE8GaYYIjxcSgAcAVZexyeMyGUzGulQ2ExnAk6lMZWpTbkgW/NEm5IRQKiDRS9EAlhIXTk1bUW3JyJJEm+1NX2mtFMAtS0z2lMJkcWatMcNFIyTbSmTrJBLMgQI4tRcexMy5gFu6ldV924GErd61gBuYtpEvR+uMpDAoD4oyPaH2SZT5j8jjrkP8uU+RGlDa2HBcbVLVYjSBNpgdX3DwcAIQiSJTmgJMu35L4pxqTUbK/5QhUFILc1ky1DaGUHKUvZERZ1pHb2rHdrOD7Gg+dAqDN7lD9MlBwawAHh0qlJHRNxQItQJPCgCdgJjVae6gYSuKImUIzRvAhmUxKt728NKuxUMbRcA/NImGoluYH6RKOdQ1BS24lO9XHyBjDJewelp06dOnTp06Zv95s1fWYMBYQAvY+kkkfU4O6yd+sEBTVq96nd3fuWzQSR1OTJ1T1YRsqz2YTejV8GIZA5/G1QRFlXMcP8AjvRlgSBkSgPihyByJqUVbYDMhlZlfK3JQRZhMp7w6ulWWSf3ijLEI4ZbMI14lo/KgEAbHqqqkdI5bZ+fKfkUKQORKcdtKjKgL/bsHdZO/WSSG5zUCQzYg+nCWAtu5crNY/TGvIQIvqlIKwcgRK3WM3xSZKAgqeJDfR1oBUGvQW+kTlE70hhsWIFwtA3oHGgYFwrOHR1qfAlFrgxLMbqTHCDCWyMDOc0oH+LKc+7bWmf3JwksBwGdqul2UliORIFzS1hhGf25o4mfrBKsA0xOSTSAuuM29qCHEQyoIdTVjBQl+oI6xMkuiWkkSGFDAOFcwaUG320RyMrRDzQmHBCSPYNlwUC2A7CkiE6lzf0FCkL4w67rCVIBKZlHDJGauAIWTHJUShJwPjfNHTFCARkcJ4F54S2Nf+6VgpBXGmh8ZzQAQWPVC0FgLdWGUWdKUCAZNDbdYiefEBMDxtxYMGrR+wkBt0S0vaSwzIhg+1ZLlVIYscmuatAgSnPcEsu6+JWvDEpIAZSXvVv9rF/Qi6G5TqplmGUX8AAoOcBAHCJk+vOkckwHqjz4O6yd/Z5GIjkkmUQhat8huFyrhgtJFXVESWAnCDrHvSEQYGGBQiYDRIgqqhYNAwl7XpFNDmyIiATKNt6hhmiboqLr+lMV2qWSqSLzupzB6iHSMuCzMa1BEBgjBg77TRw7bggATZHWC+amLHPRZCQaN3LUaJkyIOVwRrSc3WACgXyBrUuNtT5FCM7DNXFV2S5W7ZCQldSm4HQWiTPuJpLBChDlMxkUJTCItmwWVWUZvT/gc40M9qLZ2i/oB4ZPQJf1T+gru2BVu22GcFNmCIoaHyCPfNXshzanK4mzG0Lr8h4LIYuVrN1LHGPXTQM9GU2ODFzGtXyd8MNIX3HjFit9r5CAoCAmXNLiBLiWxZnYsPFCaB+IbcJIOhM3opxIk6Su/BSdSGkKGF5s1An9sAohInVmouUlUnKLiIjmoxAkBOtJfmo3ygwVaSnum914JYExC/NCIhMPX6h8gV1WxRIZJHh1Uycp5fjKkjxZHTR9CBe0PbzYO6yd/wACOuF0w5EOjajAFXCJEGb4LxSo6Hj7I0o5S2qdrr0kclFAA5XG5KBJGHWh5RkMnZ+nwSynKD6QTgWom3Bn/P6FGU/AQOoxh4b/AEDzlHSIQjQYZhaUxIJffyCrmAw2FJjioQTCH2BYqUXxvCES6HIUHuX8TibrFjSguyMg4g2koCAAgAgD6hhAbwwne9MGBhnuvgnlNoJY1GB3ku+1QUb8z382Dusnf8CZiAMYF/kR71PIDwBYDqXenwh2VvZNSfYoe7w59mGjtopywbW1/IF6UCrAXVrHbakTLirexMa0+spFs9VyfqkkGEGXgCdE1pS6EAWgyinRb6bfcj8VZ17b0ICZgz5RoAIG6OvQwd1k7+yNWUGJ7w2ff6gsWLFixYsWLFixYsWLFixYsWLFiwErBgtxCffzZQmwJ4GVwC1g3nDcTgWNUPFWE8CdSQ/I1NurcrdXuiW7RKT/ANn4UebQEAWbK7F2pi5LkIGB2+81dHLtRhoQKIB0G0SpyvsTEwOm4pAWMw3Hcv8AFDQS5ywJ8C0IBGRwnkQnYnDuqR7fUFixYsWLFixYsWLFixYsWLFixYsWNqYbVugA9vsWDusnf8BR4yWLbT8ZY1dKimaIjerwiIqfhziOx+1CKtZjOgXqEjxKlkjz+DdcVACNYWFg/wAVLagdtnfc0h4ljKYolywNi7m8+A2Ss40miTejaIbnCbBZUT0rDNKu9NbJbM9TqNNz79g7rJ34sUgEtpp2yKXeOPWOcasv0Ye4Zv0zFs6t6PwUBhHDUUBGlBMSyxoUBJiiAy6LRR6hOyJcRoYqlJGRE9Pegz0deURo7+DCPdHHibuqMUgbnJHdJrRVokk3K2KFasldZLPixMIQgspNTaiedJc4TQfCAUqIdonLUZuGG7ozHiAWCAQTAso58AJYKqiQGjHi9BDsAJVXBU4TlJGFf+p4KQbkshRf3QZc2aDedPZoQdAXA2IB7KSHKBQ8hXUxQAUnaB/elP2xZA3HdatFmt2P4MVNioAkl01hru+R6EBAHIjkrW/F4ebPyBw0XhKipUjCD7woFyTSyLgMOS32MiZSZ2rlYJZh+jN0Auq2KCdcw2DrxB1YSuxXMuFWDusnfkgcglYnyqWGEHFTzxq5dfVOgQUhCRI8UGB3wUwcJOZRpxuFjAxIAZJF8sVK0E6qVvecIMVPnbM5QJBgtdcxSUp4rRAioTe9NjiyztVWD4KYznvEoyxBqX5qQAzqWkq1gYDNK+bCdEkxPKM1BuZAbG6Gjq3G1RtAB7LVRfN4oAGlkAJWEVy+5RVy6VM4BUTcdqD7Qc2VKQ0m7WtWm/XObmcnDNC7qcpIhOM09wDEgBDAGQQdmgU4yUzm6ChnBRLbkhhdWmYqCJg8QEQySnLVaToMvQIswRDEm1AQxg3ygWRcJQ0oclUMQTCXoISb3pxwmDSS+JSlgmGysY4mkWLJOPcaPvRUHxEWD2HkbT9goNEHR+adKVCQOWc0iyccoGZpH/ai8BWZaaMqTedasGECJBYBTlTijo527TdaOT3j0CLatlVGGyppmmSaQSfAdSjCh0VvFIcklQGY3VgLtP8AIlgAmRkNGDxSkCDZ4oIi5upoAoYJwwsI3SZiitIQpkKYtJExxSUyxxsMoCDCzLoF6HMdYmQgxYbsxDU4fDXEreNs60Oaf82goDrNqTkZR1GUKPm3VYVvtMyo5dSA1aYHigMoEims5tUAny2Lm1EwX9msI9M6UhQY0jNHeAcBJeqPZ8sZ3BE0XOo/SBVwi8AN6sjom5lRugJLba9AIB8U9tnW9KqEkAFUMrM61JV5SiFiuXsRdtSQhpZADHz6KT5QjIxYTFF0nCpj1LYjrY7aduzWsnkj5v8AVOXTXjXsqE5gTC60rJ36IMAVkcNBAIfVJfEHIGyJqVBacJcmXE3jFN5ythYc5G1KYGTJCIcxaai1jhtbh1Kg/wB6mxuhxQxIGGIgN5Fr0BsY2Dw+G1HBcotiYtEVkM3A2ch+29OjyBH3CxUFFodgxw9qMAMtRMALWh7mreLowbGLOq0BygyC2DQoxO6wy7mutC8xy6smxpTonlAK0ngwRmozPiLHHAxTmlkU7K5zwo1ziwMydbabaUz/AMQirQxHGtFjA4BYRGG1JaKqzZC1IB7gbKJdFvQTi/J2rIwJVMWq36qRhWVnJnVaDkSRbcTBG7FJKSn3D/0z4K0vbmIgdcWZ1pTuDDEmHfkq3QYXAZOHJ5xFIslvNmkZKKLxvIYJKWVh48KHMfQ538FAmuILUhACbb0KIIJbc0KfY1bCgBbU68wEEYQaVghfU5VoOXBShNCMsUx1sSsFIzcgF2ALFZOSfslFy43pUIQkiMNFP9KKKwyGTrFJ3Tm3uJIaOU3Y2BAjWNtq0cHlyLAWsB8KGT2bDQWCCKOGJooqi5oInASgYgEMUZAEAIA88wnAX0nei4ebH0oU96jcfamxlol3v6QJj1ENOdFLOzwceM+b/VZO6/xtlZO/tdxe5hEkYhhhlovGSR+5M+6l54ZWMipJ4olwWPDrYEnukx5ZoXAuWjzEtXYqg8y9XahTBtesQvsUwBklELqU8paivQnlgSEHRC9Yk+bM9X5RTFGiiFZSWjVpGNIkkzCJ60ok6AqF/i1qswiAh1TAG9JdIkKJEsOUX8i9ghjlJ7iQu9OyM5jJZA+qV0YIe5rClveoxjsA1ACgmpPlLAJFBlYQe6VIEGFSZgu1GUjLWj2TanR0xdMVNIYEwZaVGge0hUbHqt922hffSovDdr1g68w5DmxpUsDNHB3vR8pWAWPTSaEkpoWeygdHFeXv4/N/qkVhdWikd+EGcVk7+1qqmWThIAibFNJqBNgpHM4uS8mdClYeBiXRpTaZxmiGoFsOdt1pSgZQ7ZAS940sjTfU2EpXgAzJJ1vSNl4mITdtbSZ4pORvnxOxG0ry2KlBz5wTKmzi+OaXNtcMKLARKTadaARgMSkExKMWH5oaYY5QXRq0Y9W7cfdwt8xTi0sxNlGv+vNAjiLBbdf1goH1mIvfd6bVerGZFlJoYJTilCrBb7Qbcln6Dst4aUckYkqPCvP17q4dUPGWAatUmAQIgsyp2BULLOVGNKDETNA/4IUGRUbdU7uYbYSXa8dFAroNFrWCM3nFQlShYZClliP7q9zY0JkJWJgE3oFNopEQZIFZMRf1gQmUJLjWPqFMZBL6TSkXF2Otqwd1k7+/DPlf14nwmSRs+9HhCCgDYPBegR5EISmSk2ZMf1OvdI2KLtNdGzptQ0AozfWOR8lhP0E9TABLmYSz5HLOGZBhGF5SaAABAWAot1oYmymku+ftODusnf8AB0yQOvZFWTintiUu3hI+yHFC6SOkEggEvZb/AHNhG6bz/wDKgawmHyb3YVxvtWXBvl00IJLno4O6yd/zpdIEsE1CFxyy9bUvdfKtfG+T/Bz4FZtVcdNJDBgY89rgJWJqE1WriEkaV//Z" alt="SKSH Mubadarat Logo" class="site-logo" />
+    </div>
+    <div class="eyebrow">ESC 2022 · Pre-operative NCS</div>
+    <h1>Non-cardiac Surgery<br>CV Assessment</h1>
+    <p class="subtitle">Structured risk capture with automatic RCRI calculation, ESC surgical risk mapping, and guideline-aligned recommendations.</p>
+  </section>
+
+  <section class="card" aria-live="polite">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="progressLabel">Step 1 of 3</span>
+        <span id="progressPct">33%</span>
+      </div>
+      <div class="progress-bar" aria-hidden="true">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- QUESTION SCREEN -->
+    <section class="content" id="questionScreen">
+      <h2 class="step-title" id="stepTitle"></h2>
+      <p class="step-note" id="stepNote"></p>
+      <div id="stepBody"></div>
+      <div class="summary" id="summaryBox">
+        <h2>Captured inputs</h2>
+        <div class="chips" id="chips"></div>
+      </div>
+    </section>
+
+    <!-- RESULT SCREEN -->
+    <section class="result-screen" id="resultScreen">
+
+      <!-- Print-only header -->
+      <div class="print-header" id="printHeader">
+        <div class="print-header-left">
+          <img src="data:image/jpeg;base64,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/wD83/8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AL//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/APDW/wD7/v8Ap7//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wC9bf8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/DW//wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wB//wBBf+kL/wD7/wDv/wD7/wD/AP8A/wD/AP8A/wD/AP8A/wD/APf/AP8A/wD6Xw1vP/8A/wD/AP8A/wD/AP8A/wD/AP8A/wDNuTLt2TdJTr5ff8/LHrzu/wD0uttbPV//AP8A/aX/AP8A/wDq/wD/AM//AP8A/wD+/wBDW/d//wD/ANL7/wD/AP8A/wD/AP8A957/AOuOv/8Arnrv/wDlD8OzH/8A/wDvblbe3PfffXf/AP8A/v8A/wD/AP8A/wD/AP8A/wD/APDW/wD/AP8A/wD3/wD/AP8A/wD/AP8A/wD/APdRYgAtlZMs+/8A/wCWNx1//wD/AP8A+5uHG3EnX/8A/wD/AP8A/wD/AP8A/wD/AD/+v3/8Nb//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A1vC9rtv/AP8A/wD/AO9/+8+//wD/AP8A/wD/AP8A/wD/AL2P/wBv3/8ADW//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wDPOOOOOOOOOOO//wCeBlEfwVv7zjjjjjjjjjjv/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8Aw1v9P+dP/wD97/8A/wD/AP8A8+3FlY9Nx11Nx138DsMT6+uM/wD/ALH3vrDr7rbrf/8A/J//AMf/AP8A/wD+tP5T1v8A/wDv/wD/AP8A/wD/AP8A/wD/AP8A/Pfv+ySJySHOf/8A/wD/ACuuU/8A/wA4456/6LTq467/AP8A4l//AMbb/wD/AP8Alz9YFb//AP8A/wD/AP8A/wD/AP8A/wD/AP8A/wD/AP8A7vXfbfX/AP8A/wBv71If/wD7/wD/AP8A87/23pH/AP8A/wD/APvf/wD/AP8A/wD/AP8A/wD/AO8N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" alt="SKSH Logo" class="print-logo" />
+        </div>
+        <div class="print-header-right">
+          <div class="print-header-title">Pre-operative NCS Cardiovascular Assessment</div>
+          <div class="print-header-dept">Cardiology Department · Sheikh Khalifa Specialty Hospital · Ras Al-Khaimah</div>
+          <div class="print-header-meta-row"><span>ESC 2022 Guidelines</span><span id="printDate"></span></div>
+        </div></div>
+
+      <div class="result-header" id="resultHeader">
+        <div class="result-icon" id="resultIcon">✓</div>
+        <div>
+          <h2 class="result-title" id="resultTitle">Peri-operative recommendations</h2>
+          <p class="result-subtitle" id="resultSubtitle"></p>
+        </div>
+      </div>
+
+      <!-- RCRI / Risk card -->
+      <section class="risk-card" id="riskCard">
+        <div class="risk-head">
+          <h3 class="risk-title">RCRI-estimated MACE risk</h3>
+          <div class="risk-score" id="rcriScoreLabel">RCRI 0</div>
+        </div>
+
+        <div class="gauge-wrap">
+          <!-- SVG GAUGE — scale: 0–12% MACE = full arc
+               Zone boundaries: 1% (low) at f=1/12, 5% (intermediate) at f=5/12
+               Center (110,110), r=80
+               1% boundary → 165° → (32.7, 89.3)
+               5% boundary → 105° → (89.3, 32.7)                       -->
+          <div class="gauge-svg-col">
+            <svg class="gauge-svg" viewBox="0 0 220 148" role="img" aria-label="Animated RCRI MACE risk gauge">
+              <!-- Background track -->
+              <path class="gauge-bg" d="M 30 110 A 80 80 0 0 1 190 110"/>
+
+              <!-- Zone: green → <1% MACE: arc from 180° to 165° -->
+              <path class="gauge-zone-low"  d="M 30 110   A 80 80 0 0 1 32.7 89.3"/>
+              <!-- Zone: amber → 1–5% MACE: arc from 165° to 105° -->
+              <path class="gauge-zone-mid"  d="M 32.7 89.3 A 80 80 0 0 1 89.3 32.7"/>
+              <!-- Zone: red   → 5–12% MACE: arc from 105° to 0° -->
+              <path class="gauge-zone-high" d="M 89.3 32.7 A 80 80 0 0 1 190 110"/>
+
+              <!-- Tick marks at zone boundaries -->
+              <!-- 1% tick at 165°: inner (r=72) to outer (r=80) -->
+              <line class="gauge-tick" x1="40.3" y1="88.6"  x2="32.7" y2="89.3"/>
+              <!-- 5% tick at 105°: inner to outer -->
+              <line class="gauge-tick" x1="88.5" y1="40.0"  x2="89.3" y2="32.7"/>
+
+              <!-- Zone % labels along arc rim -->
+              <text class="gauge-band-label" x="22"  y="78"  fill="#64748b">1%</text>
+              <text class="gauge-band-label" x="82"  y="20"  fill="#64748b">5%</text>
+
+              <!-- Animated fill -->
+              <path class="gauge-fill" id="gaugeFill" d="M 30 110 A 80 80 0 0 1 190 110"/>
+
+              <!-- Score text -->
+              <text class="gauge-score"   id="gaugeScore"   x="110" y="86">0.4%</text>
+              <text class="gauge-caption" id="gaugeCaption" x="110" y="105">Estimated MACE</text>
+            </svg>
+            <!-- Legend -->
+            <div class="gauge-legend">
+              <div class="gauge-legend-item"><div class="legend-dot" style="background:#86efac"></div>&lt;1% Low</div>
+              <div class="gauge-legend-item"><div class="legend-dot" style="background:#fcd34d"></div>1–5% Inter.</div>
+              <div class="gauge-legend-item"><div class="legend-dot" style="background:#fca5a5"></div>&gt;5% High</div>
+            </div>
+          </div>
+
+          <div class="gauge-metrics">
+            <div class="metric-box">
+              <div class="metric-label">MACE estimate</div>
+              <div class="metric-value" id="macePercent">0.4%</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">RCRI risk class</div>
+              <div class="risk-band band-vlow" id="riskBand">Very low</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESC surgical risk row (populated dynamically) -->
+        <div class="esc-row" id="escRow" style="display:none">
+          <span class="esc-label">ESC 2022 surgical risk:</span>
+          <span class="esc-chip" id="escChip">—</span>
+        </div>
+
+        <div class="risk-factors" id="rcriFactors"></div>
+      </section>
+
+      <div class="esc-ref-badge">
+        <span>📋</span>
+        <span>Recommendations per 2022 ESC Guidelines on CV Assessment and Management for NCS (Eur Heart J 2022; Aug 26)</span>
+      </div>
+
+      <div id="actionBanner"></div>
+
+      <div class="rec-section-title">Peri-operative guidance</div>
+      <ul class="recommendations" id="recommendationsList"></ul>
+
+      <div class="inline-actions">
+        <button class="btn-print" id="printBtn">🖨️ Print / Save as PDF</button>
+        <div class="btn-row" style="margin-top:9px;">
+          <button class="btn-outline" id="editBtn">← Review inputs</button>
+          <button class="btn btn-danger" id="resetBtn">Start over</button>
+        </div>
+      </div>
+
+      <div class="disclaimer-box">
+        <div class="disclaimer-icon">⚠️</div>
+        <div class="disclaimer-body">
+          <div class="disclaimer-title">Clinical Disclaimer</div>
+          <div class="disclaimer-text">
+            This tool provides decision-support guidance based on the 2022 ESC Guidelines on Cardiovascular Assessment and Management of Patients Undergoing Non-Cardiac Surgery. It is intended for use by qualified healthcare professionals only and does not replace clinical judgement, direct patient assessment, or formal specialist evaluation. Recommendations generated are algorithmic and may not account for all individual patient circumstances, comorbidities, or local protocols. All clinical decisions remain the sole responsibility of the treating physician and must be made in the context of the individual patient. Sheikh Khalifa Specialty Hospital, Mubadarat, and the developers of this tool accept no liability for clinical outcomes arising from its use.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="step-footer" id="footer">
+      <button class="btn btn-secondary" id="backBtn" type="button">Back</button>
+      <button class="btn btn-primary"   id="nextBtn" type="button">Next</button>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ─── Labels ─────────────────────────────────── */
+const labels = {
+  emergency: 'Emergency surgery',
+  symptoms: 'Active cardiac symptoms',
+  symptomTimeSensitive: 'Time-sensitive surgery',
+  ageGroup: 'Age',
+  surgeryType: 'Surgery type',
+  escRisk: 'ESC surgical risk',
+  functionalCapacity: 'Functional capacity',
+  frailty: 'Frailty',
+  cvRiskFactors: 'CV risk factors',
+  rcriHighRiskSurgery: 'RCRI high-risk surgery'
+};
+
+/* ─── Steps ──────────────────────────────────── */
+const steps = [
+  {
+    key: 'overview',
+    title: 'Case urgency and active symptoms',
+    note: 'Begin with the immediate peri-operative context. Emergency surgery or active cardiac symptoms change the entire pathway before formal risk stratification applies.'
+  },
+  {
+    key: 'procedure',
+    title: 'Procedure, age, and risk profile',
+    note: 'Select surgery category (ESC risk and RCRI high-risk surgery item are derived automatically), then complete the patient-specific risk context.'
+  },
+  {
+    key: 'history',
+    title: 'Clinical history and RCRI predictors',
+    note: 'Select all conditions that apply. These items feed both the RCRI score and the ESC 2022 pathway logic. Select carefully — they drive the recommendations.'
+  }
+];
+
+/* ─── History options ────────────────────────── */
+const historyOptions = [
+  { value: 'ihd',        label: 'Ischaemic heart disease (MI, angina, positive stress test, nitrate use, Q waves on ECG)' },
+  { value: 'hf',         label: 'Heart failure (diagnosed or clinically present)' },
+  { value: 'valvular',   label: 'Significant valvular heart disease' },
+  { value: 'cva',        label: 'Cerebrovascular disease (stroke or TIA)' },
+  { value: 'insulin',    label: 'Diabetes mellitus treated with insulin' },
+  { value: 'creatinine', label: 'Pre-operative creatinine >2.0 mg/dL (177 µmol/L)' },
+  { value: 'otherCvd',   label: 'Other established CVD (PAD, prior revascularisation, cardiomyopathy)' }
+];
+
+/* ─── Surgery type options ───────────────────── */
+// ESC 2022 risk category + Lee 1999 RCRI high-risk surgery item
+// RCRI high-risk: "intraperitoneal, intrathoracic, or suprainguinal vascular surgery" (Lee 1999)
+const surgeryTypeOptions = [
+  { value: 'superficial',       label: 'Superficial / minor / ophthalmic / dental',              escRisk: 'low',          rcriHighRisk: 'no'  },
+  { value: 'breast-thyroid',    label: 'Breast / thyroid / minor gynaecology',                   escRisk: 'low',          rcriHighRisk: 'no'  },
+  { value: 'endoscopy',         label: 'Endoscopy / ambulatory / day-case procedure',             escRisk: 'low',          rcriHighRisk: 'no'  },
+  { value: 'orthopaedic-major', label: 'Major orthopaedic (hip / knee / spine)',                  escRisk: 'intermediate', rcriHighRisk: 'no'  },
+  { value: 'urology-major',     label: 'Major urological (open prostatectomy / renal / bladder)', escRisk: 'intermediate', rcriHighRisk: 'no'  },
+  { value: 'head-neck',         label: 'Head and neck surgery',                                   escRisk: 'intermediate', rcriHighRisk: 'no'  },
+  { value: 'peripheral-vasc',   label: 'Peripheral / infra-inguinal vascular or amputation',      escRisk: 'high',         rcriHighRisk: 'no'  },
+  { value: 'intraperitoneal',   label: 'Major intraperitoneal (bowel / hepatic / pancreatic)',     escRisk: 'high',         rcriHighRisk: 'yes' },
+  { value: 'intrathoracic',     label: 'Intrathoracic (lung resection / oesophagectomy)',          escRisk: 'high',         rcriHighRisk: 'yes' },
+  { value: 'aortic-vascular',   label: 'Aortic or suprainguinal vascular surgery',                escRisk: 'high',         rcriHighRisk: 'yes' },
+  { value: 'other-high',        label: 'Other high-risk procedure (cystectomy / adrenal etc.)',   escRisk: 'high',         rcriHighRisk: 'no'  }
+];
+
+/* ─── State ──────────────────────────────────── */
+const state = {
+  stepIndex: 0,
+  resultVisible: false,
+  data: {
+    emergency: '', symptoms: '', symptomTimeSensitive: '',
+    ageGroup: '', surgeryType: '', escRisk: '', functionalCapacity: '',
+    frailty: '', cvRiskFactors: '', rcriHighRiskSurgery: '', history: []
+  }
+};
+
+/* ─── DOM refs ───────────────────────────────── */
+const els = {
+  progressLabel:       document.getElementById('progressLabel'),
+  progressPct:         document.getElementById('progressPct'),
+  progressFill:        document.getElementById('progressFill'),
+  stepTitle:           document.getElementById('stepTitle'),
+  stepNote:            document.getElementById('stepNote'),
+  stepBody:            document.getElementById('stepBody'),
+  chips:               document.getElementById('chips'),
+  questionScreen:      document.getElementById('questionScreen'),
+  resultScreen:        document.getElementById('resultScreen'),
+  footer:              document.getElementById('footer'),
+  backBtn:             document.getElementById('backBtn'),
+  nextBtn:             document.getElementById('nextBtn'),
+  resultHeader:        document.getElementById('resultHeader'),
+  resultIcon:          document.getElementById('resultIcon'),
+  resultTitle:         document.getElementById('resultTitle'),
+  resultSubtitle:      document.getElementById('resultSubtitle'),
+  recommendationsList: document.getElementById('recommendationsList'),
+  riskCard:            document.getElementById('riskCard'),
+  rcriScoreLabel:      document.getElementById('rcriScoreLabel'),
+  macePercent:         document.getElementById('macePercent'),
+  riskBand:            document.getElementById('riskBand'),
+  gaugeFill:           document.getElementById('gaugeFill'),
+  gaugeScore:          document.getElementById('gaugeScore'),
+  gaugeCaption:        document.getElementById('gaugeCaption'),
+  rcriFactors:         document.getElementById('rcriFactors'),
+  escRow:              document.getElementById('escRow'),
+  escChip:             document.getElementById('escChip'),
+  actionBanner:        document.getElementById('actionBanner'),
+  editBtn:             document.getElementById('editBtn'),
+  resetBtn:            document.getElementById('resetBtn'),
+  printBtn:            document.getElementById('printBtn'),
+  printDate:           document.getElementById('printDate')
+};
+
+/* ─── Progress ───────────────────────────────── */
+function renderProgress() {
+  const current = state.stepIndex + 1;
+  const total   = steps.length;
+  const pct     = Math.round((current / total) * 100);
+  els.progressLabel.textContent = `Step ${current} of ${total}`;
+  els.progressPct.textContent   = `${pct}%`;
+  els.progressFill.style.width  = `${pct}%`;
+}
+
+/* ─── Button helpers ─────────────────────────── */
+function choiceButton(text, selected, onClick) {
+  const btn = document.createElement('button');
+  btn.type      = 'button';
+  btn.className = 'choice' + (selected ? ' selected' : '');
+  btn.innerHTML = `<span>${text}</span><span class="check">${selected ? '✓' : ''}</span>`;
+  btn.addEventListener('click', onClick);
+  return btn;
+}
+
+function renderSingleChoice(fieldKey, options) {
+  const wrap = document.createElement('div');
+  wrap.className = 'choice-grid';
+  options.forEach(opt => {
+    wrap.appendChild(choiceButton(opt.label, state.data[fieldKey] === opt.value, () => {
+      state.data[fieldKey] = opt.value;
+      if (fieldKey === 'surgeryType') {
+        state.data.escRisk          = opt.escRisk;
+        state.data.rcriHighRiskSurgery = opt.rcriHighRisk;
+      }
+      renderStep();
+    }));
+  });
+  return wrap;
+}
+
+function renderHistoryChecklist() {
+  const wrap = document.createElement('div');
+  wrap.className = 'toggle-list';
+  historyOptions.forEach(opt => {
+    const selected = state.data.history.includes(opt.value);
+    const btn = document.createElement('button');
+    btn.type      = 'button';
+    btn.className = 'toggle' + (selected ? ' selected' : '');
+    btn.innerHTML = `<span>${opt.label}</span><span class="check">${selected ? '✓' : ''}</span>`;
+    btn.addEventListener('click', () => {
+      const set = new Set(state.data.history);
+      if (set.has(opt.value)) set.delete(opt.value); else set.add(opt.value);
+      state.data.history = Array.from(set);
+      renderStep();
+    });
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
+function fieldCard(label, help, content) {
+  const card    = document.createElement('div');
+  card.className = 'field-card';
+  const heading = document.createElement('div');
+  heading.className = 'field-label';
+  heading.textContent = label;
+  card.appendChild(heading);
+  if (help) {
+    const sub = document.createElement('div');
+    sub.className   = 'field-help';
+    sub.textContent = help;
+    card.appendChild(sub);
+  }
+  card.appendChild(content);
+  return card;
+}
+
+/* ─── Step renderers ─────────────────────────── */
+function renderOverviewStep() {
+  const grid = document.createElement('div');
+  grid.className = 'form-grid';
+
+  grid.appendChild(fieldCard(
+    'Emergency or life-threatening surgery',
+    'Emergency procedures (e.g. ruptured AAA, perforated viscus, haemorrhage) must not be delayed for routine pre-operative cardiac testing.',
+    renderSingleChoice('emergency', [
+      { value: 'yes', label: 'Yes — cannot be delayed' },
+      { value: 'no',  label: 'No — can be planned' }
+    ])
+  ));
+
+  grid.appendChild(fieldCard(
+    'New or worsening active cardiac symptoms',
+    'Active symptoms include new chest pain, progressive dyspnoea, palpitations, syncope, pre-syncope, or oedema that is unexplained or recently changed.',
+    renderSingleChoice('symptoms', [
+      { value: 'yes', label: 'Yes — symptoms present' },
+      { value: 'no',  label: 'No — asymptomatic' }
+    ])
+  ));
+
+  if (state.data.symptoms === 'yes') {
+    grid.appendChild(fieldCard(
+      'Is the surgery time-sensitive despite symptoms?',
+      'Examples: cancer resection, critical ischaemia, bowel obstruction — where delay would worsen surgical outcomes.',
+      renderSingleChoice('symptomTimeSensitive', [
+        { value: 'yes', label: 'Yes — time-sensitive' },
+        { value: 'no',  label: 'No — deferral possible' }
+      ])
+    ));
+  }
+  return grid;
+}
+
+function renderProcedureStep() {
+  const grid = document.createElement('div');
+  grid.className = 'form-grid';
+
+  grid.appendChild(fieldCard(
+    'Patient age group',
+    'Age affects biomarker thresholds (≥45 yrs), ESC pathway routing (≥65 yrs), frailty assessment (≥70 yrs), and post-operative surveillance decisions.',
+    renderSingleChoice('ageGroup', [
+      { value: '18-44',  label: '18–44 years' },
+      { value: '45-64',  label: '45–64 years' },
+      { value: '65-69',  label: '65–69 years' },
+      { value: '70plus', label: '70 years or older' }
+    ])
+  ));
+
+  grid.appendChild(fieldCard(
+    'Planned surgery type',
+    'Select the most appropriate category. ESC surgical risk tier and the RCRI high-risk surgery item are derived automatically from this selection.',
+    renderSingleChoice('surgeryType', surgeryTypeOptions)
+  ));
+
+  if (state.data.surgeryType) {
+    const derived = document.createElement('div');
+    derived.className = 'chips';
+    const escLabel = { low: 'ESC Low-risk (<1% MACE)', intermediate: 'ESC Intermediate-risk (1–5% MACE)', high: 'ESC High-risk (>5% MACE)' }[state.data.escRisk] || state.data.escRisk;
+    derived.innerHTML = `
+      <span class="chip">${escLabel}</span>
+      <span class="chip">RCRI high-risk surgery: ${state.data.rcriHighRiskSurgery === 'yes' ? '✓ Yes' : '✗ No'}</span>`;
+    const wrap = document.createElement('div');
+    wrap.appendChild(derived);
+    grid.appendChild(fieldCard('Automatically derived from surgery type', '', wrap));
+  }
+
+  grid.appendChild(fieldCard(
+    'Additional cardiovascular risk factors',
+    'Hypertension, dyslipidaemia, smoking, CKD (not meeting RCRI creatinine threshold), obesity (BMI >30), or peripheral arterial disease — in the absence of established CVD.',
+    renderSingleChoice('cvRiskFactors', [
+      { value: 'yes', label: 'Yes — present' },
+      { value: 'no',  label: 'No — none' }
+    ])
+  ));
+
+  // Functional capacity: only needed for intermediate/high-risk surgery
+  if (state.data.escRisk && state.data.escRisk !== 'low') {
+    grid.appendChild(fieldCard(
+      'Functional capacity',
+      '≥4 METs = adequate (climb stairs, brisk walk, moderate housework, golf). Poor FC (<4 METs) or unknown FC requires additional pathway consideration.',
+      renderSingleChoice('functionalCapacity', [
+        { value: 'good',    label: 'Good — ≥4 METs' },
+        { value: 'poor',    label: 'Poor — <4 METs' },
+        { value: 'unknown', label: 'Unknown / unassessable' }
+      ])
+    ));
+  }
+
+  if (state.data.ageGroup === '70plus') {
+    grid.appendChild(fieldCard(
+      'Frailty assessment (age ≥70)',
+      'Use a validated screening tool (e.g. Clinical Frailty Scale). Frailty is an independent predictor of peri-operative morbidity and mortality.',
+      renderSingleChoice('frailty', [
+        { value: 'yes', label: 'Frailty present' },
+        { value: 'no',  label: 'Not frail' }
+      ])
+    ));
+  }
+  return grid;
+}
+
+function renderHistoryStep() {
+  const grid = document.createElement('div');
+  grid.className = 'form-grid';
+  grid.appendChild(fieldCard(
+    'Clinical history and RCRI predictors',
+    'Select all that apply. These items are used for both RCRI scoring and the ESC 2022 pathway. IHD, HF, and CVA/TIA are both RCRI predictors and markers of established CVD.',
+    renderHistoryChecklist()
+  ));
+  return grid;
+}
+
+/* ─── Summary chips ──────────────────────────── */
+function renderSummaryChips() {
+  const chips = [];
+  const d = state.data;
+  const escLabels = { low: 'ESC Low', intermediate: 'ESC Intermediate', high: 'ESC High' };
+  if (d.emergency)           chips.push(`Emergency: ${d.emergency}`);
+  if (d.symptoms)            chips.push(`Symptoms: ${d.symptoms}`);
+  if (d.symptoms === 'yes' && d.symptomTimeSensitive) chips.push(`Time-sensitive: ${d.symptomTimeSensitive}`);
+  if (d.ageGroup)            chips.push(`Age: ${d.ageGroup}`);
+  if (d.surgeryType)         chips.push(surgeryTypeOptions.find(o => o.value === d.surgeryType)?.label?.split('/')[0].trim() || d.surgeryType);
+  if (d.escRisk)             chips.push(escLabels[d.escRisk] || d.escRisk);
+  if (d.cvRiskFactors)       chips.push(`CV risk factors: ${d.cvRiskFactors}`);
+  if (d.functionalCapacity)  chips.push(`FC: ${d.functionalCapacity}`);
+  if (d.frailty)             chips.push(`Frailty: ${d.frailty}`);
+  if (d.history.length)      chips.push(`History: ${d.history.map(v => historyOptions.find(h => h.value === v)?.label?.split(' ')[0]).join(', ')}`);
+  els.chips.innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join('');
+}
+
+/* ─── Validation ─────────────────────────────── */
+function validateStep() {
+  const d = state.data;
+  if (state.stepIndex === 0) {
+    if (!d.emergency || !d.symptoms) return false;
+    if (d.symptoms === 'yes' && !d.symptomTimeSensitive) return false;
+    return true;
+  }
+  if (state.stepIndex === 1) {
+    if (!d.ageGroup || !d.surgeryType || !d.cvRiskFactors) return false;
+    if (d.escRisk !== 'low' && !d.functionalCapacity) return false;
+    if (d.ageGroup === '70plus' && !d.frailty) return false;
+    return true;
+  }
+  if (state.stepIndex === 2) return true;
+  return false;
+}
+
+/* ─── Render step ────────────────────────────── */
+function renderStep() {
+  renderProgress();
+  const meta = steps[state.stepIndex];
+  els.stepTitle.textContent = meta.title;
+  els.stepNote.textContent  = meta.note;
+  els.stepBody.innerHTML    = '';
+  if (meta.key === 'overview')  els.stepBody.appendChild(renderOverviewStep());
+  if (meta.key === 'procedure') els.stepBody.appendChild(renderProcedureStep());
+  if (meta.key === 'history')   els.stepBody.appendChild(renderHistoryStep());
+  renderSummaryChips();
+  els.backBtn.disabled = state.stepIndex === 0;
+  els.nextBtn.disabled = !validateStep();
+  els.nextBtn.textContent = state.stepIndex === steps.length - 1 ? 'Get recommendations' : 'Next →';
+}
+
+/* ─── Risk profile ───────────────────────────── */
+function getProfile() {
+  const d   = state.data;
+  const has = code => d.history.includes(code);
+
+  const establishedCVD = has('ihd') || has('hf') || has('valvular') || has('cva') || has('otherCvd');
+  const age65plus      = d.ageGroup === '65-69' || d.ageGroup === '70plus';
+  const age70plus      = d.ageGroup === '70plus';
+  const age45plus      = d.ageGroup !== '18-44';  // ≥45 yrs threshold for biomarkers/surveillance
+
+  // RCRI score — Lee 1999 six-item score
+  const rcriScore =
+    (d.rcriHighRiskSurgery === 'yes' ? 1 : 0) +
+    (has('ihd')        ? 1 : 0) +
+    (has('hf')         ? 1 : 0) +
+    (has('cva')        ? 1 : 0) +
+    (has('insulin')    ? 1 : 0) +
+    (has('creatinine') ? 1 : 0);
+
+  // MACE estimates (Lee 1999; validated in ESC 2022)
+  let mace = 0.4, band = 'Very low';
+  if      (rcriScore === 1) { mace =  0.9;  band = 'Low'; }
+  else if (rcriScore === 2) { mace =  6.6;  band = 'Intermediate'; }
+  else if (rcriScore >= 3)  { mace = 11.0;  band = 'High'; }
+
+  // FIX: gaugeLevel is now fraction of the full arc on a 0–12% linear MACE scale.
+  // 12% = full arc (100%). Anything beyond 12% is capped at 100%.
+  // This makes the gauge zones visually correspond to the actual ESC thresholds.
+  const gaugeLevel = Math.min((mace / 12) * 100, 100);
+
+  const factors = [];
+  if (d.rcriHighRiskSurgery === 'yes') factors.push('High-risk surgery');
+  if (has('ihd'))        factors.push('Ischaemic heart disease');
+  if (has('hf'))         factors.push('Heart failure');
+  if (has('cva'))        factors.push('Cerebrovascular disease');
+  if (has('insulin'))    factors.push('Insulin-treated diabetes');
+  if (has('creatinine')) factors.push('Creatinine >2.0 mg/dL');
+
+  return { establishedCVD, age65plus, age70plus, age45plus, rcriScore, mace, band, gaugeLevel, factors };
+}
+
+/* ─── Gauge animation ────────────────────────── */
+function animateRiskGauge(displayPercent, gaugeLevel, band) {
+  const path        = els.gaugeFill;
+  const totalLength = path.getTotalLength();
+  const fillColors  = { 'Very low':'#0f766e', 'Low':'#16a34a', 'Intermediate':'#d97706', 'High':'#dc2626' };
+  path.style.stroke = fillColors[band] || '#0f766e';
+  path.style.strokeDasharray  = `${totalLength}`;
+  path.style.strokeDashoffset = `${totalLength}`;
+  const targetOffset = totalLength * (1 - gaugeLevel / 100);
+  const start = performance.now(), duration = 880;
+  function ease(t) { return 1 - Math.pow(1 - t, 3); }
+  function frame(now) {
+    const t      = Math.min((now - start) / duration, 1);
+    const et     = ease(t);
+    path.style.strokeDashoffset = `${totalLength - (totalLength - targetOffset) * et}`;
+    const cur = (displayPercent * et).toFixed(1);
+    els.gaugeScore.textContent  = `${cur}%`;
+    els.macePercent.textContent = `${cur}%`;
+    if (t < 1) requestAnimationFrame(frame);
+    else {
+      els.gaugeScore.textContent  = `${displayPercent.toFixed(1)}%`;
+      els.macePercent.textContent = `${displayPercent.toFixed(1)}%`;
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ─── Recommendation helper ──────────────────── */
+function addRec(type, text) {
+  const li = document.createElement('li');
+  li.setAttribute('data-type', type);
+  li.textContent = text;
+  els.recommendationsList.appendChild(li);
+}
+
+/* ─── Action banner helper ───────────────────── */
+function setActionBanner(type, headline, subtext) {
+  // type: 'proceed' | 'delay' | 'consult' | 'caution'
+  const icons = { proceed:'✅', delay:'🚫', consult:'👨‍⚕️', caution:'⚠️' };
+  const labels = { proceed:'Surgical decision', delay:'Surgical decision', consult:'Cardiology referral required', caution:'Proceed with caution' };
+  els.actionBanner.innerHTML = `
+    <div class="action-banner ${type}">
+      <div class="action-banner-icon">${icons[type]}</div>
+      <div class="action-banner-body">
+        <div class="action-banner-label">${labels[type]}</div>
+        <div class="action-banner-text">${headline}</div>
+        ${subtext ? `<div class="action-banner-sub">${subtext}</div>` : ''}
+      </div>
+    </div>`;
+}
+
+/* ─── Show results ───────────────────────────── */
+function showResults() {
+  const d = state.data;
+  const p = getProfile();
+
+  // Clear previous
+  els.recommendationsList.innerHTML = '';
+  els.rcriFactors.innerHTML         = '';
+  els.actionBanner.innerHTML        = '';
+  // Set print date
+  els.printDate.textContent = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+
+  // ── RCRI card ──────────────────────────────────────
+  els.rcriScoreLabel.textContent = `RCRI ${p.rcriScore}`;
+  els.gaugeCaption.textContent   = 'Estimated MACE';
+  animateRiskGauge(p.mace, p.gaugeLevel, p.band);
+
+  // Risk band styling
+  const bandClass = { 'Very low':'band-vlow', 'Low':'band-low', 'Intermediate':'band-inter', 'High':'band-high' }[p.band] || 'band-vlow';
+  els.riskBand.className   = `risk-band ${bandClass}`;
+  els.riskBand.textContent = p.band;
+
+  // ESC surgical risk display
+  if (d.escRisk) {
+    els.escRow.style.display = 'flex';
+    const cls   = { low:'esc-low', intermediate:'esc-inter', high:'esc-high' }[d.escRisk];
+    const label = { low:'Low-risk NCS (<1% MACE)', intermediate:'Intermediate-risk NCS (1–5% MACE)', high:'High-risk NCS (>5% MACE)' }[d.escRisk];
+    els.escChip.className   = `esc-chip ${cls}`;
+    els.escChip.textContent = label;
+  }
+
+  // RCRI factors
+  if (!p.factors.length) {
+    const b = document.createElement('span');
+    b.className = 'risk-factor'; b.textContent = 'No RCRI predictors selected';
+    els.rcriFactors.appendChild(b);
+  } else {
+    p.factors.forEach(f => {
+      const b = document.createElement('span');
+      b.className = 'risk-factor'; b.textContent = f;
+      els.rcriFactors.appendChild(b);
+    });
+  }
+
+  // ── RECOMMENDATION HEADER icon helper ──────────────
+  function setHeader(iconText, iconClass, title, subtitle) {
+    els.resultHeader.className  = `result-header ${iconClass}-header`;
+    els.resultIcon.className    = `result-icon ${iconClass}-icon`;
+    els.resultIcon.textContent  = iconText;
+    els.resultTitle.textContent = title;
+    els.resultSubtitle.textContent = subtitle;
+  }
+
+  // ═══════════════════════════════════════════════════
+  // TIER 1: Emergency surgery
+  // ═══════════════════════════════════════════════════
+  if (d.emergency === 'yes') {
+    setHeader('⚡', 'urgent', 'Immediate surgical pathway', 'Do not delay surgery for pre-operative cardiac testing.');
+    setActionBanner('proceed', 'Proceed to surgery immediately — do not delay for cardiac evaluation.', 'Emergency surgery takes absolute priority. Cardiac assessment is deferred to the post-operative period.');
+    addRec('urgent', 'PROCEED: Take the patient to theatre without delay. Cardiac evaluation must not defer definitive surgical treatment in a life- or limb-threatening emergency.');
+    addRec('info',   'Obtain only focused bedside investigations that are immediately actionable for anaesthetic or haemodynamic management (e.g. ECG, point-of-care echo if available).');
+    addRec('consult','CONSULT CARDIOLOGY peri-operatively when haemodynamic instability, major known CVD, or operative complexity is present — cardiology input is provided concurrently, not as a prerequisite to surgery.');
+    addRec('info',   'The RCRI score displayed is informational only in the emergency context and must not delay treatment.');
+
+  // ═══════════════════════════════════════════════════
+  // TIER 2: Active cardiac symptoms
+  // ═══════════════════════════════════════════════════
+  } else if (d.symptoms === 'yes') {
+    if (d.symptomTimeSensitive === 'yes') {
+      setHeader('⏱', 'warning', 'Urgent focused cardiac assessment', 'Active symptoms with time-sensitive surgery — rapid targeted evaluation required before proceeding.');
+      setActionBanner('caution', 'Proceed only after rapid targeted assessment and documented team agreement.', 'Surgery should not proceed until a multidisciplinary decision has been made and the risk–benefit balance explicitly documented.');
+      addRec('urgent', 'Do not proceed to theatre until a rapid focused cardiac assessment has been completed and a multidisciplinary decision documented — this applies even when surgery is time-sensitive.');
+      addRec('test',   'Perform immediately actionable investigations: 12-lead ECG, bedside TTE if feasible, and hs-cTnI/T if an acute coronary syndrome cannot be excluded.');
+      addRec('consult','CONSULT CARDIOLOGY URGENTLY — convene a multidisciplinary team (surgery, anaesthesia, peri-operative medicine, cardiology) before proceeding. Define and document the acceptable risk–benefit balance and the plan for undiagnosed cardiac conditions.');
+      addRec('med',    'Continue essential cardiac medications peri-operatively; optimise haemodynamics as rapidly as feasible.');
+      addRec('ok',     'PROCEED only after team agreement is documented, the cardiac assessment is complete (even if rapid and incomplete), and the anaesthetic plan accounts for the identified cardiovascular risk.');
+    } else {
+      setHeader('!', 'danger', 'Defer surgery — cardiac evaluation required', 'Active or worsening cardiac symptoms must be investigated before elective NCS proceeds.');
+      setActionBanner('delay', 'DELAY surgery — do not proceed until cardiac evaluation is complete and the patient is optimised.', 'Active cardiac symptoms are a contraindication to elective NCS. Surgery should be rescheduled after full investigation and treatment.');
+      addRec('urgent', 'DELAY elective surgery. Do not schedule or proceed while active cardiac symptoms remain unexplained or untreated — regardless of surgical urgency when deferral is safely possible.');
+      addRec('test',   'Obtain a 12-lead ECG and transthoracic echocardiography as initial directed investigations for the presenting symptoms.');
+      addRec('test',   'Measure hs-cTnI or hs-cTnT if an acute coronary syndrome is suspected or cannot be excluded.');
+      addRec('consult','CONSULT CARDIOLOGY — formal cardiology evaluation, diagnosis, and optimisation of the underlying cardiac condition is mandatory before surgical planning can resume. Do not reschedule surgery without cardiology clearance.');
+      addRec('info',   'Re-assess surgical timing after full stabilisation, treatment, and documented cardiac optimisation. Communicate the outcome of the cardiac review to the surgical and anaesthetic teams before rescheduling.');
+    }
+
+  // ═══════════════════════════════════════════════════
+  // TIER 3: Routine ESC 2022 pre-operative pathway
+  // ═══════════════════════════════════════════════════
+  } else {
+    setHeader('✓', '', 'Peri-operative recommendations', 'Systematic assessment complete — ESC 2022 guideline pathway applied.');
+
+    const lowRisk   = d.escRisk === 'low';
+    const interRisk = d.escRisk === 'intermediate';
+    const highRisk  = d.escRisk === 'high';
+    const poorFC    = d.functionalCapacity === 'poor' || d.functionalCapacity === 'unknown';
+    const unknownFC = d.functionalCapacity === 'unknown';
+
+    // Derived patient category flags
+    const youngNoRisk = !p.age65plus && !p.establishedCVD && d.cvRiskFactors === 'no';
+
+    // ── LOW-RISK SURGERY: No testing for any patient (ESC 2022 Class III) ──
+    if (lowRisk) {
+      setActionBanner('proceed', 'Proceed to surgery — no pre-operative cardiac testing is required.', 'Low-risk NCS: ESC 2022 recommends against routine cardiac testing regardless of patient CV profile (Class III).');
+      addRec('ok',     'PROCEED: No routine pre-operative cardiac testing is required for low-risk surgery, regardless of patient CV profile (ESC 2022 — Class III: testing provides no benefit and may cause harm).');
+      addRec('info',   'Continue with standard peri-operative care and anaesthetic pre-assessment.');
+
+    // ── INTERMEDIATE / HIGH-RISK SURGERY ──────────────────────────────────
+    } else {
+
+      // ── CATEGORY A: Young (<65), no established CVD, no CV risk factors ──
+      if (youngNoRisk) {
+        if (interRisk) {
+          setActionBanner('proceed', 'Proceed to surgery — no pre-operative cardiac testing is required.', 'Patient under 65 with no CV risk factors or established CVD undergoing intermediate-risk surgery: ESC 2022 does not recommend routine cardiac testing.');
+          addRec('ok',   'PROCEED: No routine pre-operative cardiac testing is required — patient is under 65 years with no CV risk factors or established CVD undergoing intermediate-risk surgery (ESC 2022).');
+        } else {
+          // High-risk surgery, young, no risk factors
+          if (!p.age45plus) {
+            setActionBanner('proceed', 'Proceed to surgery — no cardiac testing required for patients under 45 with no risk factors.', 'Clinical judgement applies. No ESC 2022 threshold for mandatory testing in this low-risk group.');
+            addRec('ok',   'PROCEED: No routine cardiac testing is required for patients under 45 years with no CV risk factors, even for high-risk surgery. Apply clinical judgement based on operative findings and anaesthetic assessment.');
+          } else {
+            setActionBanner('proceed', 'Proceed to surgery after completing ECG and cardiac biomarker testing.', 'Age ≥45 with high-risk NCS: pre-operative ECG and hs-cTnI/T are required before proceeding — ESC 2022.');
+            addRec('test', 'Obtain a pre-operative 12-lead ECG — patient is aged ≥45 years undergoing high-risk NCS (ESC 2022).');
+            addRec('test', 'Measure hs-cTnI or hs-cTnT pre-operatively and at 24 h and 48 h post-operatively — required for patients aged ≥45 years undergoing high-risk NCS to detect MINS (myocardial injury after NCS) (ESC 2022).');
+            addRec('ok',   'PROCEED to surgery once ECG and baseline troponin are obtained. No cardiology consultation is required unless results are abnormal or new findings emerge.');
+          }
+        }
+
+      // ── CATEGORY B/C: ≥65 yrs OR CV risk factors OR established CVD ──────
+      } else {
+
+        // ECG: recommended for all intermediate/high-risk in this group
+        addRec('test', 'Obtain a pre-operative 12-lead ECG — indicated for intermediate- or high-risk NCS in patients with CV risk factors, age ≥65, or established CVD (ESC 2022).');
+
+        // Biomarkers: hs-cTnI/T for all ≥45 in this group
+        if (p.age45plus) {
+          addRec('test', 'Measure hs-cTnI or hs-cTnT pre-operatively and at 24 h and 48 h post-operatively to detect MINS — elevated post-operative troponin is associated with significantly worse 30-day outcomes (ESC 2022).');
+        }
+
+        // BNP / NT-proBNP: consider for HF, established CVD, or RCRI ≥2
+        if (p.establishedCVD || p.rcriScore >= 2 || d.history.includes('hf')) {
+          addRec('test', 'Consider pre-operative BNP or NT-proBNP measurement — elevated natriuretic peptides independently predict peri-operative cardiac morbidity and 30-day mortality (ESC 2022 Class IIa).');
+        }
+
+        // ── FUNCTIONAL CAPACITY ASSESSMENT (intermediate/high-risk) ──
+        if (poorFC) {
+          if (highRisk && p.establishedCVD) {
+            // Highest risk combination → mandatory cardiology consultation + delay
+            setActionBanner('consult', 'CONSULT CARDIOLOGY — do not proceed until cardiology review and MDT decision are documented.', 'Established CVD + high-risk surgery + poor/unknown functional capacity: cardiology consultation is a Class I ESC 2022 indication. Surgery must be delayed until the cardiac evaluation is complete.');
+            addRec('consult', 'CONSULT CARDIOLOGY — mandatory. This patient has established CVD combined with high-risk surgery and poor or unknown functional capacity. This combination is a Class I indication for cardiology review under ESC 2022. Do not schedule surgery until the cardiology assessment is complete.');
+            addRec('delay',   'DELAY surgery until after the multidisciplinary team (cardiology, surgery, anaesthesia) has formally co-determined the optimal management strategy and the decision is documented.');
+            addRec('test',    'Further targeted cardiac investigation as directed by cardiology: CPET (cardiopulmonary exercise testing), stress imaging (stress echo or myocardial perfusion imaging), or resting echocardiography as clinically indicated.');
+            addRec('info',    'Explore less invasive surgical alternatives — the combination of established CVD, high surgical risk, and poor functional capacity mandates reconsideration of surgical technique, staged approach, or conservative management before proceeding.');
+          } else {
+            // Poor FC, not the highest-risk combination
+            if (highRisk || p.rcriScore >= 2) {
+              setActionBanner('consult', 'CONSULT CARDIOLOGY and consider delaying surgery pending formal functional capacity assessment.', `${unknownFC ? 'Functional capacity is unassessable' : 'Reduced functional capacity'} in a patient with high surgical risk or RCRI ≥2 — cardiology input is recommended to determine whether further testing will change management.`);
+              addRec('consult', 'CONSULT CARDIOLOGY or peri-operative medicine — poor or unknown functional capacity in the context of high surgical risk or RCRI ≥2 requires specialist input to determine whether further cardiac testing (CPET or stress imaging) would alter peri-operative management or the decision to proceed.');
+              addRec('delay',   `CONSIDER DELAYING surgery pending results of formal functional capacity testing, if the outcome would change management (e.g. decision to proceed, surgical approach, or revascularisation). If testing will not change management, document this decision explicitly and proceed with enhanced monitoring.`);
+            } else {
+              setActionBanner('caution', 'Proceed with caution — consider functional capacity testing if it would change management.', `${unknownFC ? 'Functional capacity is unassessable' : 'Reduced functional capacity is present'} — pursue additional assessment only if the result would alter the peri-operative plan.`);
+              addRec('test',    `${unknownFC ? 'Functional capacity cannot be assessed clinically' : 'Reduced functional capacity is present'} — consider CPET or non-invasive stress imaging only if the result would alter peri-operative management (e.g. decision to proceed, modify the surgical approach, or pursue revascularisation) (ESC 2022).`);
+            }
+            addRec('consult','Involve peri-operative medicine or anaesthesia for holistic risk assessment. Escalate to cardiology when established CVD, RCRI ≥2, or high-risk surgery is combined with poor or unknown functional capacity.');
+          }
+        } else {
+          // Good FC
+          if (highRisk && p.establishedCVD) {
+            setActionBanner('proceed', 'Proceed to surgery after completing investigations — consider cardiology input given CVD and high surgical risk.', 'Good functional capacity is reassuring. Cardiology consultation is recommended but not mandatory if investigations are normal and the patient is well optimised.');
+            addRec('consult','CONSULT CARDIOLOGY or peri-operative medicine — established CVD combined with high-risk surgery warrants a specialist review to confirm optimisation, even with preserved functional capacity. Cardiology input should be sought before the operation if not recently reviewed.');
+            addRec('info',   'Good functional capacity is reassuring — however, given established CVD combined with high-risk surgery, explore whether a less invasive surgical approach can reduce overall peri-operative CV risk (ESC 2022).');
+            addRec('ok',     'PROCEED to surgery once investigations are reviewed, the cardiology team has been involved, and the anaesthetic plan is confirmed.');
+          } else if (p.rcriScore >= 2) {
+            setActionBanner('proceed', 'Proceed to surgery after completing investigations — peri-operative specialist input is recommended.', 'RCRI ≥2 indicates elevated risk. Investigations should be reviewed and a peri-operative consultation completed before surgery.');
+            addRec('consult','CONSULT peri-operative medicine or anaesthesia for holistic risk assessment. Include cardiology when established CVD is present or the RCRI score is ≥2 with high-risk surgery.');
+            addRec('ok',     'PROCEED to surgery once indicated investigations are reviewed and the peri-operative monitoring and escalation plan is confirmed with the anaesthetic team.');
+          } else {
+            setActionBanner('proceed', 'Proceed to surgery after completing indicated investigations.', 'Complete ECG and troponin testing as indicated, then proceed with standard peri-operative care.');
+            addRec('ok',     'PROCEED to surgery once the indicated pre-operative investigations (ECG, biomarkers) are reviewed. No mandatory cardiology consultation is required unless results reveal new or unexpected findings.');
+          }
+        }
+      }
+
+      // ── SURVEILLANCE: for all intermediate/high with elevated risk ──────
+      if ((p.establishedCVD || d.cvRiskFactors === 'yes' || p.age65plus || p.rcriScore >= 1) && !youngNoRisk) {
+        addRec('monitor','Plan peri-operative ECG and cardiac monitoring — elevated overall peri-operative CV risk warrants continuous surveillance of haemodynamics and rhythm in the intra-operative and early post-operative period.');
+      }
+    }
+
+    // ── FRAILTY (applies regardless of surgery risk) ──────────────────────
+    if (p.age70plus && d.frailty === 'yes') {
+      addRec('consult','CONSULT geriatric medicine or involve geriatric-informed peri-operative planning — frailty is present in a patient aged 70 years or older. Consider comprehensive geriatric assessment before elective surgery. Frailty is an independent predictor of peri-operative morbidity and mortality (ESC 2022). Do not proceed to elective surgery without a documented frailty-informed peri-operative plan.');
+    }
+
+    // ── MEDICATIONS (universal chronic therapy guidance) ──────────────────
+    addRec('med', 'Continue chronic beta-blocker and statin therapy perioperatively when already prescribed — abrupt cessation is associated with increased CV risk. Do not initiate high-dose beta-blockade de novo immediately before surgery solely for peri-operative risk reduction (ESC 2022 Class III).');
+
+    // ── PROCEED STATEMENT ────────────────────────────────────────────────
+    if (lowRisk || (youngNoRisk && interRisk) || (youngNoRisk && !p.age45plus && highRisk)) {
+      addRec('ok', 'Proceed to surgery with standard peri-operative care. No specific cardiac preparation is required beyond routine anaesthetic pre-assessment.');
+    } else {
+      addRec('ok', 'Proceed after completing indicated investigations, optimising modifiable cardiovascular risk factors, and confirming the peri-operative monitoring and escalation plan with the anaesthetic team.');
+    }
+  }
+
+  // ── Show result screen ────────────────────────────────────────────────
+  els.questionScreen.classList.add('hidden');
+  els.footer.classList.add('hidden');
+  els.resultScreen.style.display = 'block';
+  state.resultVisible = true;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ─── Navigation ─────────────────────────────── */
+function nextStep() {
+  if (!validateStep()) return;
+  if (state.stepIndex === steps.length - 1) { showResults(); return; }
+  state.stepIndex += 1;
+  renderStep();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function backStep() {
+  if (state.stepIndex === 0) return;
+  state.stepIndex -= 1;
+  renderStep();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function reviewInputs() {
+  state.resultVisible = false;
+  els.resultScreen.style.display = 'none';
+  els.questionScreen.classList.remove('hidden');
+  els.footer.classList.remove('hidden');
+  renderStep();
+}
+function resetAll() {
+  state.stepIndex = 0;
+  state.resultVisible = false;
+  state.data = {
+    emergency:'', symptoms:'', symptomTimeSensitive:'',
+    ageGroup:'', surgeryType:'', escRisk:'', functionalCapacity:'',
+    frailty:'', cvRiskFactors:'', rcriHighRiskSurgery:'', history:[]
+  };
+  els.resultScreen.style.display = 'none';
+  els.questionScreen.classList.remove('hidden');
+  els.footer.classList.remove('hidden');
+  renderStep();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ─── Event wiring ───────────────────────────── */
+els.nextBtn.addEventListener('click', nextStep);
+els.backBtn.addEventListener('click', backStep);
+els.editBtn.addEventListener('click', reviewInputs);
+els.resetBtn.addEventListener('click', resetAll);
+els.printBtn.addEventListener('click', () => window.print());
+
+document.addEventListener('keydown', e => {
+  if (state.resultVisible) return;
+  if (e.key === 'Enter') { e.preventDefault(); nextStep(); }
+  if (e.key === 'Backspace' && document.activeElement === document.body) { e.preventDefault(); backStep(); }
+});
+
+/* ─── Init ───────────────────────────────────── */
+renderStep();
+</script>
+</body>
+</html>
