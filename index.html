@@ -430,6 +430,96 @@
     .disclaimer-title { font-size: 0.76rem; font-weight: 800; color: #92400e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
     .disclaimer-text  { font-size: 0.78rem; color: #78350f; line-height: 1.55; }
 
+
+    /* ── TEXT INPUT ── */
+    .text-input-wrap { display: grid; gap: 9px; }
+    .text-input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+      border-radius: 12px; font-size: 0.93rem; font-family: inherit;
+      color: var(--text); background: #fff; outline: none;
+      transition: border-color 0.15s;
+    }
+    .text-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(15,118,110,0.10); }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ── CARDIOLOGY LETTER BUTTON ── */
+    .btn-letter {
+      min-height: 50px; border: 1.5px solid #7c3aed; background: rgba(124,58,237,0.07);
+      color: #5b21b6; border-radius: 12px; padding: 0 18px;
+      font-size: 0.90rem; font-weight: 700; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.15s; width: 100%; margin-top: 10px;
+    }
+    .btn-letter:hover { background: rgba(124,58,237,0.14); }
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+      backdrop-filter: blur(4px); z-index: 1000;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 20px 14px; overflow-y: auto;
+    }
+    .modal-box {
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(15,23,42,0.22);
+      width: 100%; max-width: 620px; overflow: hidden;
+      margin: auto;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px; border-bottom: 1px solid var(--line);
+      background: rgba(124,58,237,0.05);
+    }
+    .modal-header-title { font-size: 1rem; font-weight: 800; color: #3b0764; }
+    .modal-close {
+      width: 34px; height: 34px; border-radius: 8px; border: none;
+      background: #f1f5f9; color: #64748b; font-size: 1.1rem;
+      cursor: pointer; display: grid; place-items: center; font-family: inherit;
+    }
+    .modal-close:hover { background: #e2e8f0; }
+    .modal-body { padding: 18px; }
+    .letter-paper {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 22px 24px; font-size: 0.86rem; line-height: 1.6;
+      color: #1e293b; white-space: pre-wrap; font-family: Georgia, serif;
+      max-height: 55vh; overflow-y: auto;
+    }
+    .modal-actions {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      padding: 14px 18px; border-top: 1px solid var(--line);
+      background: rgba(248,250,252,0.95);
+    }
+    .btn-modal-action {
+      min-height: 46px; border-radius: 11px; font-family: inherit;
+      font-size: 0.88rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    .btn-modal-print { background: #0f766e; color: #fff; border: none; }
+    .btn-modal-copy  { background: #fff; color: #334155; border: 1.5px solid #e2e8f0; }
+    .btn-modal-copy:hover { background: #f8fafc; }
+    .copy-toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: #fff; padding: 10px 20px; border-radius: 999px;
+      font-size: 0.84rem; font-weight: 700; opacity: 0;
+      transition: opacity 0.25s; pointer-events: none; z-index: 2000;
+    }
+    .copy-toast.show { opacity: 1; }
+
+    /* ── PATIENT INFO STRIP (result screen) ── */
+    .patient-strip {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(15,118,110,0.05); border: 1px solid rgba(15,118,110,0.14);
+    }
+    .patient-strip-item { font-size: 0.78rem; font-weight: 700; color: #134e4a; }
+    .patient-strip-sep  { color: #94a3b8; font-size: 0.78rem; }
+
+    @media print {
+      .modal-overlay { display: none !important; }
+      .btn-letter { display: none !important; }
+      .patient-strip { break-inside: avoid; }
+    }
+
     .hidden { display: none !important; }
 
     @media (max-width: 480px) {
@@ -486,6 +576,7 @@
           <div class="print-header-meta-row"><span>ESC 2022 Guidelines</span><span id="printDate"></span></div>
         </div></div>
 
+      <div class="patient-strip hidden" id="patientStrip"></div>
       <div class="result-header" id="resultHeader">
         <div class="result-icon" id="resultIcon">✓</div>
         <div>
@@ -576,6 +667,7 @@
       <ul class="recommendations" id="recommendationsList"></ul>
 
       <div class="inline-actions">
+        <button class="btn-letter hidden" id="letterBtn">📨 Generate Cardiology Referral Letter</button>
         <button class="btn-print" id="printBtn">🖨️ Print / Save as PDF</button>
         <div class="btn-row" style="margin-top:9px;">
           <button class="btn-outline" id="editBtn">← Review inputs</button>
@@ -600,6 +692,24 @@
       <button class="btn btn-primary"   id="nextBtn" type="button">Next</button>
     </div>
   </section>
+
+<!-- Cardiology letter modal -->
+<div class="modal-overlay hidden" id="letterModal" role="dialog" aria-modal="true" aria-label="Cardiology referral letter">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-header-title">📨 Cardiology Referral Letter</div>
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="letter-paper" id="letterContent"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-action btn-modal-print" id="letterPrintBtn">🖨️ Print Letter</button>
+      <button class="btn-modal-action btn-modal-copy"  id="letterCopyBtn">📋 Copy Text</button>
+    </div>
+  </div>
+</div>
+<div class="copy-toast" id="copyToast">Copied to clipboard ✓</div>
 </main>
 
 <script>
@@ -669,9 +779,11 @@ const state = {
   stepIndex: 0,
   resultVisible: false,
   data: {
+    patientName: '', sex: '', mrn: '',
     emergency: '', symptoms: '', symptomTimeSensitive: '',
     ageGroup: '', surgeryType: '', escRisk: '', functionalCapacity: '',
-    frailty: '', cvRiskFactors: '', rcriHighRiskSurgery: '', history: []
+    frailty: '', cvRiskFactors: '', rcriHighRiskSurgery: '',
+    recentStenting: '', history: []
   }
 };
 
@@ -708,7 +820,15 @@ const els = {
   editBtn:             document.getElementById('editBtn'),
   resetBtn:            document.getElementById('resetBtn'),
   printBtn:            document.getElementById('printBtn'),
-  printDate:           document.getElementById('printDate')
+  printDate:           document.getElementById('printDate'),
+  patientStrip:        document.getElementById('patientStrip'),
+  letterBtn:           document.getElementById('letterBtn'),
+  letterModal:         document.getElementById('letterModal'),
+  letterContent:       document.getElementById('letterContent'),
+  modalClose:          document.getElementById('modalClose'),
+  letterPrintBtn:      document.getElementById('letterPrintBtn'),
+  letterCopyBtn:       document.getElementById('letterCopyBtn'),
+  copyToast:           document.getElementById('copyToast')
 };
 
 /* ─── Progress ───────────────────────────────── */
@@ -789,6 +909,31 @@ function renderOverviewStep() {
   const grid = document.createElement('div');
   grid.className = 'form-grid';
 
+  // Patient demographics
+  const demoWrap = document.createElement('div');
+  demoWrap.className = 'text-input-wrap';
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text'; nameInput.className = 'text-input';
+  nameInput.placeholder = 'Patient full name'; nameInput.value = state.data.patientName || '';
+  nameInput.addEventListener('input', e => { state.data.patientName = e.target.value; renderSummaryChips(); });
+  const rowDiv = document.createElement('div');
+  rowDiv.className = 'input-row';
+  const mrnInput = document.createElement('input');
+  mrnInput.type = 'text'; mrnInput.className = 'text-input';
+  mrnInput.placeholder = 'MRN / Hospital number'; mrnInput.value = state.data.mrn || '';
+  mrnInput.addEventListener('input', e => { state.data.mrn = e.target.value; renderSummaryChips(); });
+  rowDiv.appendChild(mrnInput);
+  // Sex selector (styled as a native select)
+  const sexSel = document.createElement('select');
+  sexSel.className = 'text-input';
+  sexSel.innerHTML = '<option value="">Sex — select</option><option value="Male">Male</option><option value="Female">Female</option>';
+  sexSel.value = state.data.sex || '';
+  sexSel.addEventListener('change', e => { state.data.sex = e.target.value; renderSummaryChips(); });
+  rowDiv.appendChild(sexSel);
+  demoWrap.appendChild(nameInput);
+  demoWrap.appendChild(rowDiv);
+  grid.appendChild(fieldCard('Patient demographics', 'Name and MRN are optional but required for the cardiology referral letter.', demoWrap));
+
   grid.appendChild(fieldCard(
     'Emergency or life-threatening surgery',
     'Emergency procedures (e.g. ruptured AAA, perforated viscus, haemorrhage) must not be delayed for routine pre-operative cardiac testing.',
@@ -798,6 +943,7 @@ function renderOverviewStep() {
     ])
   ));
 
+  // Symptoms always shown — adds nuance even in emergency pathway
   grid.appendChild(fieldCard(
     'New or worsening active cardiac symptoms',
     'Active symptoms include new chest pain, progressive dyspnoea, palpitations, syncope, pre-syncope, or oedema that is unexplained or recently changed.',
@@ -807,15 +953,19 @@ function renderOverviewStep() {
     ])
   ));
 
-  if (state.data.symptoms === 'yes') {
+  // Time-sensitive is a property of the surgery — shown for all non-emergency cases, regardless of symptoms
+  if (state.data.emergency === 'no') {
     grid.appendChild(fieldCard(
-      'Is the surgery time-sensitive despite symptoms?',
-      'Examples: cancer resection, critical ischaemia, bowel obstruction — where delay would worsen surgical outcomes.',
+      'Is the surgery time-sensitive?',
+      'Time-sensitive: delay would worsen outcome (e.g. cancer resection, critical ischaemia, bowel obstruction). This applies regardless of whether cardiac symptoms are present.',
       renderSingleChoice('symptomTimeSensitive', [
         { value: 'yes', label: 'Yes — time-sensitive' },
         { value: 'no',  label: 'No — deferral possible' }
       ])
     ));
+  } else {
+    // Clear time-sensitive if emergency selected — not applicable
+    state.data.symptomTimeSensitive = '';
   }
   return grid;
 }
@@ -896,6 +1046,20 @@ function renderHistoryStep() {
     'Select all that apply. These items are used for both RCRI scoring and the ESC 2022 pathway. IHD, HF, and CVA/TIA are both RCRI predictors and markers of established CVD.',
     renderHistoryChecklist()
   ));
+
+  // IHD follow-up: recent coronary stenting
+  if (state.data.history.includes('ihd')) {
+    grid.appendChild(fieldCard(
+      'Recent coronary stenting within the past 12 months?',
+      'Drug-eluting stent (DES) within 12 months or bare-metal stent (BMS) within 1 month — dual antiplatelet therapy management is critical. If unknown, select Yes to trigger the relevant recommendation.',
+      renderSingleChoice('recentStenting', [
+        { value: 'yes', label: 'Yes — stented within 12 months' },
+        { value: 'no',  label: 'No — older or no stent' }
+      ])
+    ));
+  } else {
+    state.data.recentStenting = ''; // clear if IHD deselected
+  }
   return grid;
 }
 
@@ -904,6 +1068,9 @@ function renderSummaryChips() {
   const chips = [];
   const d = state.data;
   const escLabels = { low: 'ESC Low', intermediate: 'ESC Intermediate', high: 'ESC High' };
+  if (d.patientName)         chips.push(`Patient: ${d.patientName}`);
+  if (d.sex)                 chips.push(`Sex: ${d.sex}`);
+  if (d.mrn)                 chips.push(`MRN: ${d.mrn}`);
   if (d.emergency)           chips.push(`Emergency: ${d.emergency}`);
   if (d.symptoms)            chips.push(`Symptoms: ${d.symptoms}`);
   if (d.symptoms === 'yes' && d.symptomTimeSensitive) chips.push(`Time-sensitive: ${d.symptomTimeSensitive}`);
@@ -921,8 +1088,9 @@ function renderSummaryChips() {
 function validateStep() {
   const d = state.data;
   if (state.stepIndex === 0) {
-    if (!d.emergency || !d.symptoms) return false;
-    if (d.symptoms === 'yes' && !d.symptomTimeSensitive) return false;
+    if (!d.emergency) return false;
+    if (!d.symptoms) return false;                              // symptoms always required
+    if (d.emergency === 'no' && !d.symptomTimeSensitive) return false; // time-sensitive required for all non-emergency
     return true;
   }
   if (state.stepIndex === 1) {
@@ -931,7 +1099,10 @@ function validateStep() {
     if (d.ageGroup === '70plus' && !d.frailty) return false;
     return true;
   }
-  if (state.stepIndex === 2) return true;
+  if (state.stepIndex === 2) {
+    if (d.history.includes('ihd') && !d.recentStenting) return false;
+    return true;
+  }
   return false;
 }
 
@@ -989,7 +1160,12 @@ function getProfile() {
   if (has('insulin'))    factors.push('Insulin-treated diabetes');
   if (has('creatinine')) factors.push('Creatinine >2.0 mg/dL');
 
-  return { establishedCVD, age65plus, age70plus, age45plus, rcriScore, mace, band, gaugeLevel, factors };
+  const recentStenting = d.recentStenting === 'yes';
+  const hasHF = has('hf');
+  const hasIHD = has('ihd');
+  const hasDM = has('insulin');
+  const hasHypertension = d.cvRiskFactors === 'yes';
+  return { establishedCVD, age65plus, age70plus, age45plus, rcriScore, mace, band, gaugeLevel, factors, recentStenting, hasHF, hasIHD, hasDM, hasHypertension };
 }
 
 /* ─── Gauge animation ────────────────────────── */
@@ -1028,19 +1204,22 @@ function addRec(type, text) {
 }
 
 /* ─── Action banner helper ───────────────────── */
+let _needsCardiologyLetter = false;
 function setActionBanner(type, headline, subtext) {
-  // type: 'proceed' | 'delay' | 'consult' | 'caution'
-  const icons = { proceed:'✅', delay:'🚫', consult:'👨‍⚕️', caution:'⚠️' };
-  const labels = { proceed:'Surgical decision', delay:'Surgical decision', consult:'Cardiology referral required', caution:'Proceed with caution' };
+  const icons  = { proceed:'✅', delay:'🚫', consult:'👨‍⚕️', caution:'⚠️' };
+  const lbls   = { proceed:'Surgical decision', delay:'Surgical decision', consult:'Cardiology referral required', caution:'Proceed with caution' };
   els.actionBanner.innerHTML = `
     <div class="action-banner ${type}">
       <div class="action-banner-icon">${icons[type]}</div>
       <div class="action-banner-body">
-        <div class="action-banner-label">${labels[type]}</div>
+        <div class="action-banner-label">${lbls[type]}</div>
         <div class="action-banner-text">${headline}</div>
         ${subtext ? `<div class="action-banner-sub">${subtext}</div>` : ''}
       </div>
     </div>`;
+  if (type === 'consult' || type === 'delay') {
+    _needsCardiologyLetter = true;
+  }
 }
 
 /* ─── Show results ───────────────────────────── */
@@ -1049,11 +1228,29 @@ function showResults() {
   const p = getProfile();
 
   // Clear previous
+  _needsCardiologyLetter = false;
+  els.letterBtn.classList.add('hidden');
   els.recommendationsList.innerHTML = '';
   els.rcriFactors.innerHTML         = '';
   els.actionBanner.innerHTML        = '';
-  // Set print date
-  els.printDate.textContent = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+
+  // Patient strip
+  const stripItems = [];
+  if (d.patientName) stripItems.push(d.patientName);
+  if (d.sex) stripItems.push(d.sex);
+  if (d.mrn) stripItems.push(`MRN: ${d.mrn}`);
+  if (d.ageGroup) stripItems.push(`Age: ${d.ageGroup} yrs`);
+  if (stripItems.length) {
+    els.patientStrip.innerHTML = stripItems.map((s,i) =>
+      `<span class="patient-strip-item">${s}</span>${i<stripItems.length-1?'<span class="patient-strip-sep">·</span>':''}`
+    ).join('');
+    els.patientStrip.classList.remove('hidden');
+    // Also update print header patient info
+    els.printDate.textContent = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  } else {
+    els.patientStrip.classList.add('hidden');
+  }
+
 
   // ── RCRI card ──────────────────────────────────────
   els.rcriScoreLabel.textContent = `RCRI ${p.rcriScore}`;
@@ -1097,43 +1294,59 @@ function showResults() {
   }
 
   // ═══════════════════════════════════════════════════
-  // TIER 1: Emergency surgery
+  // TIER 1: Emergency surgery (symptoms add nuance)
   // ═══════════════════════════════════════════════════
   if (d.emergency === 'yes') {
-    setHeader('⚡', 'urgent', 'Immediate surgical pathway', 'Do not delay surgery for pre-operative cardiac testing.');
-    setActionBanner('proceed', 'Proceed to surgery immediately — do not delay for cardiac evaluation.', 'Emergency surgery takes absolute priority. Cardiac assessment is deferred to the post-operative period.');
-    addRec('urgent', 'PROCEED: Take the patient to theatre without delay. Cardiac evaluation must not defer definitive surgical treatment in a life- or limb-threatening emergency.');
-    addRec('info',   'Obtain only focused bedside investigations that are immediately actionable for anaesthetic or haemodynamic management (e.g. ECG, point-of-care echo if available).');
-    addRec('consult','CONSULT CARDIOLOGY peri-operatively when haemodynamic instability, major known CVD, or operative complexity is present — cardiology input is provided concurrently, not as a prerequisite to surgery.');
-    addRec('info',   'The RCRI score displayed is informational only in the emergency context and must not delay treatment.');
+    if (d.symptoms === 'yes') {
+      setHeader('⚡', 'urgent', 'Emergency surgery — active cardiac symptoms noted', 'Proceed without delay. Concurrent cardiac management required — do not defer theatre.');
+      setActionBanner('proceed', 'Proceed to surgery immediately — active cardiac symptoms noted; concurrent cardiology input required.', 'Emergency surgery cannot be delayed for cardiac evaluation. Active symptoms must be managed concurrently, not used as a reason to defer theatre.');
+      addRec('urgent', 'PROCEED to theatre without delay. Emergency surgery takes absolute priority over pre-operative cardiac evaluation.');
+      addRec('urgent', 'Active cardiac symptoms are present — this increases intra-operative risk. Cardiology must be involved concurrently to guide haemodynamic management and post-operative cardiac workup.');
+      addRec('test',   'Obtain only immediately actionable bedside investigations: 12-lead ECG, point-of-care echo if available, hs-cTnI/T — do not wait for results before proceeding.');
+      addRec('consult','CONSULT CARDIOLOGY concurrently — real-time specialist input on monitoring strategy, haemodynamic targets, and post-operative cardiac management is required.');
+    } else {
+      setHeader('⚡', 'urgent', 'Immediate surgical pathway', 'Do not delay surgery for pre-operative cardiac testing.');
+      setActionBanner('proceed', 'Proceed to surgery immediately — do not delay for cardiac evaluation.', 'Emergency surgery takes absolute priority. Cardiac assessment is deferred to the post-operative period.');
+      addRec('urgent', 'PROCEED: Take the patient to theatre without delay. Cardiac evaluation must not defer definitive surgical treatment in a life- or limb-threatening emergency.');
+      addRec('info',   'Obtain only focused bedside investigations immediately actionable for anaesthetic or haemodynamic management (e.g. ECG, point-of-care echo if available).');
+      addRec('consult','CONSULT CARDIOLOGY peri-operatively when haemodynamic instability, major known CVD, or operative complexity is present — input is concurrent, not a prerequisite to surgery.');
+    }
+    addRec('info', 'The RCRI score displayed is informational only in the emergency context and must not delay treatment.');
 
   // ═══════════════════════════════════════════════════
-  // TIER 2: Active cardiac symptoms
+  // TIER 2: Non-emergency — active cardiac symptoms
   // ═══════════════════════════════════════════════════
   } else if (d.symptoms === 'yes') {
     if (d.symptomTimeSensitive === 'yes') {
-      setHeader('⏱', 'warning', 'Urgent focused cardiac assessment', 'Active symptoms with time-sensitive surgery — rapid targeted evaluation required before proceeding.');
-      setActionBanner('caution', 'Proceed only after rapid targeted assessment and documented team agreement.', 'Surgery should not proceed until a multidisciplinary decision has been made and the risk–benefit balance explicitly documented.');
-      addRec('urgent', 'Do not proceed to theatre until a rapid focused cardiac assessment has been completed and a multidisciplinary decision documented — this applies even when surgery is time-sensitive.');
-      addRec('test',   'Perform immediately actionable investigations: 12-lead ECG, bedside TTE if feasible, and hs-cTnI/T if an acute coronary syndrome cannot be excluded.');
-      addRec('consult','CONSULT CARDIOLOGY URGENTLY — convene a multidisciplinary team (surgery, anaesthesia, peri-operative medicine, cardiology) before proceeding. Define and document the acceptable risk–benefit balance and the plan for undiagnosed cardiac conditions.');
-      addRec('med',    'Continue essential cardiac medications peri-operatively; optimise haemodynamics as rapidly as feasible.');
-      addRec('ok',     'PROCEED only after team agreement is documented, the cardiac assessment is complete (even if rapid and incomplete), and the anaesthetic plan accounts for the identified cardiovascular risk.');
+      setHeader('⏱', 'warning', 'Urgent cardiology review before surgery', 'Active symptoms with time-sensitive surgery — rapid cardiac assessment and MDT decision required.');
+      setActionBanner('consult', 'CONSULT CARDIOLOGY URGENTLY — do not proceed without a documented MDT decision.', 'Active cardiac symptoms plus time-sensitive surgery: cardiology must assess the risk–benefit balance before the patient goes to theatre.');
+      addRec('urgent', 'Do not proceed to theatre until a rapid focused cardiac assessment is complete and a multidisciplinary decision (surgery, anaesthesia, cardiology) is formally documented.');
+      addRec('test',   'Perform targeted urgent investigations: 12-lead ECG, bedside TTE if available, and hs-cTnI/T to exclude acute coronary syndrome.');
+      addRec('consult','CONSULT CARDIOLOGY — mandatory even when surgery is time-sensitive. The cardiology team must define the acceptable risk–benefit balance and advise on peri-operative cardiac management before proceeding.');
+      addRec('med',    'Continue all essential cardiac medications; optimise haemodynamics and volume status as rapidly as feasible before theatre.');
+      addRec('ok',     'PROCEED only after: (1) cardiology assessment is complete, (2) MDT decision and risk–benefit balance are documented, and (3) anaesthetic plan accounts for the identified cardiac risk.');
     } else {
       setHeader('!', 'danger', 'Defer surgery — cardiac evaluation required', 'Active or worsening cardiac symptoms must be investigated before elective NCS proceeds.');
       setActionBanner('delay', 'DELAY surgery — do not proceed until cardiac evaluation is complete and the patient is optimised.', 'Active cardiac symptoms are a contraindication to elective NCS. Surgery should be rescheduled after full investigation and treatment.');
-      addRec('urgent', 'DELAY elective surgery. Do not schedule or proceed while active cardiac symptoms remain unexplained or untreated — regardless of surgical urgency when deferral is safely possible.');
+      addRec('urgent', 'DELAY elective surgery. Do not schedule or proceed while active cardiac symptoms remain unexplained or untreated.');
       addRec('test',   'Obtain a 12-lead ECG and transthoracic echocardiography as initial directed investigations for the presenting symptoms.');
       addRec('test',   'Measure hs-cTnI or hs-cTnT if an acute coronary syndrome is suspected or cannot be excluded.');
-      addRec('consult','CONSULT CARDIOLOGY — formal cardiology evaluation, diagnosis, and optimisation of the underlying cardiac condition is mandatory before surgical planning can resume. Do not reschedule surgery without cardiology clearance.');
-      addRec('info',   'Re-assess surgical timing after full stabilisation, treatment, and documented cardiac optimisation. Communicate the outcome of the cardiac review to the surgical and anaesthetic teams before rescheduling.');
+      addRec('consult','CONSULT CARDIOLOGY — formal evaluation, diagnosis, and optimisation of the underlying cardiac condition is mandatory before surgical planning can resume. Do not reschedule surgery without cardiology clearance.');
+      addRec('info',   'Re-assess surgical timing after full stabilisation and documented cardiac optimisation. Communicate outcome to surgical and anaesthetic teams before rescheduling.');
     }
 
   // ═══════════════════════════════════════════════════
-  // TIER 3: Routine ESC 2022 pre-operative pathway
+  // TIER 3: Routine ESC 2022 pathway
+  // (No emergency, no active symptoms)
+  // time-sensitive flag adds urgency note only
   // ═══════════════════════════════════════════════════
   } else {
-    setHeader('✓', '', 'Peri-operative recommendations', 'Systematic assessment complete — ESC 2022 guideline pathway applied.');
+    const isTimeSensitive = d.symptomTimeSensitive === 'yes';
+    if (isTimeSensitive) {
+      setHeader('⏱', 'warning', 'Time-sensitive surgery — expedite ESC assessment', 'No active cardiac symptoms. Complete the ESC pre-operative pathway promptly — do not allow avoidable delays.');
+    } else {
+      setHeader('✓', '', 'Peri-operative recommendations', 'Systematic assessment complete — ESC 2022 guideline pathway applied.');
+    }
 
     const lowRisk   = d.escRisk === 'low';
     const interRisk = d.escRisk === 'intermediate';
@@ -1146,7 +1359,8 @@ function showResults() {
 
     // ── LOW-RISK SURGERY: No testing for any patient (ESC 2022 Class III) ──
     if (lowRisk) {
-      setActionBanner('proceed', 'Proceed to surgery — no pre-operative cardiac testing is required.', 'Low-risk NCS: ESC 2022 recommends against routine cardiac testing regardless of patient CV profile (Class III).');
+      const tsNote = isTimeSensitive ? ' Expedite scheduling — surgery is time-sensitive.' : '';
+      setActionBanner('proceed', 'Proceed to surgery — no pre-operative cardiac testing is required.' + tsNote, 'Low-risk NCS: ESC 2022 recommends against routine cardiac testing regardless of patient CV profile (Class III).');
       addRec('ok',     'PROCEED: No routine pre-operative cardiac testing is required for low-risk surgery, regardless of patient CV profile (ESC 2022 — Class III: testing provides no benefit and may cause harm).');
       addRec('info',   'Continue with standard peri-operative care and anaesthetic pre-assessment.');
 
@@ -1237,15 +1451,47 @@ function showResults() {
       addRec('consult','CONSULT geriatric medicine or involve geriatric-informed peri-operative planning — frailty is present in a patient aged 70 years or older. Consider comprehensive geriatric assessment before elective surgery. Frailty is an independent predictor of peri-operative morbidity and mortality (ESC 2022). Do not proceed to elective surgery without a documented frailty-informed peri-operative plan.');
     }
 
-    // ── MEDICATIONS (universal chronic therapy guidance) ──────────────────
-    addRec('med', 'Continue chronic beta-blocker and statin therapy perioperatively when already prescribed — abrupt cessation is associated with increased CV risk. Do not initiate high-dose beta-blockade de novo immediately before surgery solely for peri-operative risk reduction (ESC 2022 Class III).');
+    // ── MEDICATIONS: universal ───────────────────────────────────────────
+    addRec('med', 'Continue chronic beta-blocker and statin therapy perioperatively — abrupt cessation increases CV risk. Do not initiate high-dose beta-blockade de novo immediately before surgery solely for risk reduction (ESC 2022 Class III).');
 
-    // ── PROCEED STATEMENT ────────────────────────────────────────────────
-    if (lowRisk || (youngNoRisk && interRisk) || (youngNoRisk && !p.age45plus && highRisk)) {
-      addRec('ok', 'Proceed to surgery with standard peri-operative care. No specific cardiac preparation is required beyond routine anaesthetic pre-assessment.');
-    } else {
-      addRec('ok', 'Proceed after completing indicated investigations, optimising modifiable cardiovascular risk factors, and confirming the peri-operative monitoring and escalation plan with the anaesthetic team.');
+    // ── MEDICATIONS: hypertension ─────────────────────────────────────────
+    if (p.hasHypertension || p.establishedCVD) {
+      addRec('med', 'Optimise antihypertensive therapy pre-operatively: target BP <140/90 mmHg before elective surgery. ACE inhibitors and ARBs should typically be withheld on the morning of surgery (risk of refractory intra-operative hypotension) unless used for heart failure with reduced ejection fraction — resume as soon as oral intake is established post-operatively. Calcium-channel blockers and thiazide diuretics may be continued on the day of surgery per anaesthetic team guidance.');
     }
+
+    // ── MEDICATIONS: SGLT2 inhibitors ────────────────────────────────────
+    if (p.hasHF || p.hasDM) {
+      addRec('med', 'SGLT2 inhibitor management: withhold SGLT2 inhibitors (empagliflozin, dapagliflozin, canagliflozin) for a minimum of 3–4 days before major surgery due to risk of euglycaemic diabetic ketoacidosis (euDKA), which can occur even with normal blood glucose. Resume only when oral intake is fully re-established and renal function is confirmed stable post-operatively. In patients with HFrEF, SGLT2 inhibitors are a Class I GDMT agent — confirm restart plan with the cardiology team.');
+    }
+
+    // ── MEDICATIONS: recent stenting / antiplatelet ───────────────────────
+    if (p.recentStenting) {
+      addRec('med', 'DUAL ANTIPLATELET THERAPY (DAPT) — CRITICAL: Patient has undergone coronary stenting within the past 12 months. Do NOT discontinue DAPT (aspirin + P2Y12 inhibitor) without explicit cardiology/interventional cardiology input. Premature DAPT cessation carries a high risk of in-stent thrombosis and acute MI. Guidance: for drug-eluting stents (DES), minimum DAPT duration is 6 months (newer generation) to 12 months; for bare-metal stents (BMS), minimum 1 month. If surgery is not deferrable, discuss bridging strategy with the interventional cardiology team. Where only aspirin is stopped, continue P2Y12 inhibitor; where both are stopped, parenteral bridging (e.g. cangrelor or tirofiban) may be required in selected high-thrombotic-risk cases.');
+    } else if (p.hasIHD) {
+      addRec('med', 'Antiplatelet therapy: Continue aspirin throughout the peri-operative period unless surgical bleeding risk is extreme. Do not stop aspirin in patients with established ischaemic heart disease without explicit cardiology review. If P2Y12 inhibitor (clopidogrel, ticagrelor, prasugrel) is prescribed, discuss with the surgical and cardiology teams regarding temporary cessation timing (clopidogrel: 5 days; ticagrelor: 3–5 days; prasugrel: 7 days before surgery).');
+    }
+
+    // ── HEART FAILURE: GDMT and fluid management ──────────────────────────
+    if (p.hasHF) {
+      addRec('med', 'Heart failure — GDMT optimisation pre-operatively: Confirm that all four pillars of guideline-directed medical therapy (GDMT) for HFrEF are prescribed and optimised where tolerated: (1) ACE inhibitor / ARNI (sacubitril-valsartan), (2) Evidence-based beta-blocker (carvedilol, bisoprolol, metoprolol succinate), (3) Mineralocorticoid receptor antagonist (MRA: spironolactone or eplerenone), (4) SGLT2 inhibitor (empagliflozin or dapagliflozin). Optimise to target doses where haemodynamics permit. Cardiology input is recommended to confirm readiness for surgery.');
+      addRec('monitor', 'Heart failure — peri-operative fluid management: Aim for euvolaemia (not hypovolaemia) before surgery. Optimise diuretic dosing pre-operatively — avoid both fluid overload and excessive diuresis. Intra-operatively, use goal-directed fluid therapy; avoid aggressive fluid resuscitation which can precipitate acute HF decompensation. Post-operatively: monitor daily fluid balance, weight, and signs of decompensation closely. Maintain ACE inhibitor/ARNI and beta-blocker through the peri-operative period unless haemodynamic instability requires dose reduction.');
+    }
+
+    // ── PROCEED STATEMENT — only shown when banner is NOT delay/consult ──
+    if (!_needsCardiologyLetter) {
+      if (lowRisk || (youngNoRisk && interRisk) || (youngNoRisk && !p.age45plus && highRisk)) {
+        addRec('ok', 'Proceed to surgery with standard peri-operative care. No specific cardiac preparation is required beyond routine anaesthetic pre-assessment.');
+      } else {
+        addRec('ok', 'Proceed after completing indicated investigations, optimising modifiable cardiovascular risk factors, and confirming the peri-operative monitoring and escalation plan with the anaesthetic team.');
+      }
+    }
+  }
+
+  // ── Letter button visibility ─────────────────────────────────────────────
+  if (_needsCardiologyLetter) {
+    els.letterBtn.classList.remove('hidden');
+  } else {
+    els.letterBtn.classList.add('hidden');
   }
 
   // ── Show result screen ────────────────────────────────────────────────
@@ -1281,9 +1527,11 @@ function resetAll() {
   state.stepIndex = 0;
   state.resultVisible = false;
   state.data = {
+    patientName:'', sex:'', mrn:'',
     emergency:'', symptoms:'', symptomTimeSensitive:'',
     ageGroup:'', surgeryType:'', escRisk:'', functionalCapacity:'',
-    frailty:'', cvRiskFactors:'', rcriHighRiskSurgery:'', history:[]
+    frailty:'', cvRiskFactors:'', rcriHighRiskSurgery:'',
+    recentStenting:'', history:[]
   };
   els.resultScreen.style.display = 'none';
   els.questionScreen.classList.remove('hidden');
@@ -1292,12 +1540,131 @@ function resetAll() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+/* ─── Cardiology referral letter ────────────── */
+function generateCardiologyLetter() {
+  const d = state.data;
+  const p = getProfile();
+  const today = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+
+  const surgLabel  = (surgeryTypeOptions.find(o => o.value === d.surgeryType)?.label) || d.surgeryType || 'Not specified';
+  const escLabel   = { low:'Low-risk', intermediate:'Intermediate-risk', high:'High-risk' }[d.escRisk] || d.escRisk;
+  const ageLabel   = { '18-44':'18–44', '45-64':'45–64', '65-69':'65–69', '70plus':'≥70' }[d.ageGroup] || d.ageGroup;
+  const nameStr    = d.patientName || '[Patient Name]';
+  const mrnStr     = d.mrn ? ` (MRN: ${d.mrn})` : '';
+  const sexStr     = d.sex ? `, ${d.sex}` : '';
+  const cvdList    = d.history.map(v => historyOptions.find(h => h.value === v)?.label?.split(' (')[0]).filter(Boolean);
+  const cvdStr     = cvdList.length ? cvdList.join(', ') : 'nil documented';
+  const rfStr      = d.cvRiskFactors === 'yes' ? '; hypertension / dyslipidaemia' : '';
+
+  // ── Build issue bullets ─────────────────────────────────────────────
+  const concerns = [];
+  const asks     = [];
+  let q = 1;
+
+  if (p.recentStenting) {
+    concerns.push(`Coronary stent within 12 months — DAPT cessation risks in-stent thrombosis.`);
+    asks.push(`${q++}. DAPT: Safe to proceed? Recommended P2Y12 cessation window / bridging strategy?`);
+  } else if (p.hasIHD) {
+    concerns.push(`Known IHD — peri-operative antiplatelet management required.`);
+    asks.push(`${q++}. Antiplatelet: Continue aspirin? Safe cessation window for P2Y12 inhibitor if prescribed?`);
+  }
+
+  if (p.hasHF) {
+    concerns.push(`Heart failure — GDMT optimisation and peri-operative fluid strategy required.`);
+    asks.push(`${q++}. HF: Is GDMT optimised? Pre-op echo needed? Fluid and haemodynamic strategy?`);
+  }
+
+  if ((d.functionalCapacity === 'poor' || d.functionalCapacity === 'unknown') && d.escRisk !== 'low') {
+    const fcNote = d.functionalCapacity === 'unknown' ? 'unassessable' : 'poor (<4 METs)';
+    concerns.push(`Functional capacity ${fcNote} with ${escLabel.toLowerCase()} surgery — unclear if further testing changes plan.`);
+    asks.push(`${q++}. FC: Would CPET or stress imaging alter management or the decision to proceed?`);
+  }
+
+  if (p.rcriScore >= 2 || (p.rcriScore >= 1 && d.escRisk === 'high')) {
+    concerns.push(`RCRI ${p.rcriScore} (${p.band}; MACE ${p.mace}%) with ${escLabel.toLowerCase()} surgery — elevated peri-operative risk.`);
+    asks.push(`${q++}. Monitoring: Recommended peri-operative surveillance strategy?`);
+  }
+
+  if (d.symptoms === 'yes') {
+    concerns.push(`Active cardiac symptoms present${d.symptomTimeSensitive === 'yes' ? ' — surgery time-sensitive' : ' — surgery deferrable'}.`);
+    asks.push(`${q++}. Symptoms: Safe to proceed? Recommended evaluation and optimisation plan?`);
+  }
+
+  if (d.history.includes('valvular')) {
+    asks.push(`${q++}. Valvular disease: Current severity and peri-operative risk? Intervention or monitoring needed?`);
+  }
+
+  if (!concerns.length) {
+    concerns.push(`Elevated overall peri-operative CV risk requiring specialist review.`);
+  }
+  asks.push(`${q++}. Overall: Is the patient optimised and safe to proceed?`);
+
+  const fcShort = { good:'≥4 METs', poor:'<4 METs', unknown:'Unknown' }[d.functionalCapacity] || '—';
+  const frailTag = (d.ageGroup === '70plus' && d.frailty === 'yes') ? ' · Frail' : '';
+
+  // Pair each concern with its matching ask; last ask is always the overall fitness question
+  const paired = concerns.map((c, i) =>
+    `${i+1}. ${c}\n   → ${(asks[i] || '').replace(/^\d+\.\s*/,'')}`
+  );
+  const lastAsk = asks[asks.length - 1].replace(/^\d+\.\s*/,'');
+
+  const letter =
+`CARDIOLOGY REFERRAL — Pre-operative NCS Assessment
+SKSH · ${today}
+
+Patient:  ${nameStr}${sexStr}, ${ageLabel} yrs${mrnStr}
+Surgery:  ${surgLabel}
+Risk:     ESC ${escLabel} · RCRI ${p.rcriScore} (${p.band}, MACE ${p.mace}%)
+History:  ${cvdStr}${rfStr} · FC ${fcShort}${frailTag}
+
+Issues & Questions:
+${paired.join('\n')}
+${paired.length + 1}. ${lastAsk}
+
+Please advise at your earliest convenience.
+SKSH Pre-operative Assessment Team · ${today}`;
+
+  return letter;
+}
+
+function openLetterModal() {
+  const letter = generateCardiologyLetter();
+  els.letterContent.textContent = letter;
+  els.letterModal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeLetterModal() {
+  els.letterModal.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
 /* ─── Event wiring ───────────────────────────── */
 els.nextBtn.addEventListener('click', nextStep);
 els.backBtn.addEventListener('click', backStep);
 els.editBtn.addEventListener('click', reviewInputs);
 els.resetBtn.addEventListener('click', resetAll);
 els.printBtn.addEventListener('click', () => window.print());
+els.letterBtn.addEventListener('click', openLetterModal);
+els.modalClose.addEventListener('click', closeLetterModal);
+els.letterModal.addEventListener('click', e => { if (e.target === els.letterModal) closeLetterModal(); });
+
+els.letterPrintBtn.addEventListener('click', () => {
+  const win = window.open('', '_blank', 'width=700,height=900');
+  const letter = generateCardiologyLetter();
+  win.document.write(`<!DOCTYPE html><html><head><title>Cardiology Referral Letter</title>
+<style>body{font-family:Georgia,serif;font-size:13px;line-height:1.65;padding:32px 40px;color:#1e293b;white-space:pre-wrap;max-width:680px;margin:0 auto;}
+@media print{body{padding:20px;}}</style></head><body>${letter.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(() => { win.print(); }, 400);
+});
+
+els.letterCopyBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(generateCardiologyLetter()).then(() => {
+    els.copyToast.classList.add('show');
+    setTimeout(() => els.copyToast.classList.remove('show'), 2200);
+  });
+});
 
 document.addEventListener('keydown', e => {
   if (state.resultVisible) return;
